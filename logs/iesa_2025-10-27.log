@@ -1,0 +1,275 @@
+2025-10-27 19:26:15,307 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:26:16,620 - iesa_login - INFO - Login form loaded. Username field: , Password field: 
+2025-10-27 19:29:48,364 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:48,364 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:48,373 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: 
+2025-10-27 19:29:48,373 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: 
+2025-10-27 19:29:49,115 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:49,115 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:49,115 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:49,123 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 19:29:49,123 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 19:29:49,123 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 19:29:49,196 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:49,196 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:49,196 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:49,196 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:29:49,203 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 19:29:49,203 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 19:29:49,203 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 19:29:49,203 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 19:29:49,206 - iesa_login - INFO - Login attempt for username: inputentryoperator@iesa
+2025-10-27 19:29:49,206 - iesa_login - INFO - Login attempt for username: inputentryoperator@iesa
+2025-10-27 19:29:49,206 - iesa_login - INFO - Login attempt for username: inputentryoperator@iesa
+2025-10-27 19:29:49,206 - iesa_login - INFO - Login attempt for username: inputentryoperator@iesa
+2025-10-27 19:29:49,367 - iesa_login - INFO - Successful login for user: inputentryoperator@iesa
+2025-10-27 19:29:49,367 - iesa_login - INFO - Successful login for user: inputentryoperator@iesa
+2025-10-27 19:29:49,367 - iesa_login - INFO - Successful login for user: inputentryoperator@iesa
+2025-10-27 19:29:49,367 - iesa_login - INFO - Successful login for user: inputentryoperator@iesa
+2025-10-27 19:29:49,369 - iesa_login - INFO - Redirecting user inputentryoperator@iesa to input entry operator page
+2025-10-27 19:29:49,369 - iesa_login - INFO - Redirecting user inputentryoperator@iesa to input entry operator page
+2025-10-27 19:29:49,369 - iesa_login - INFO - Redirecting user inputentryoperator@iesa to input entry operator page
+2025-10-27 19:29:49,369 - iesa_login - INFO - Redirecting user inputentryoperator@iesa to input entry operator page
+2025-10-27 19:29:56,365 - iesa_input_entry_operator - INFO - IESA Input Entry Operator page loaded
+2025-10-27 19:29:56,923 - iesa_input_entry_operator - INFO - User selected input type: Energy Data
+2025-10-27 19:30:03,079 - iesa_input_entry_operator - INFO - IESA Input Entry Operator page loaded
+2025-10-27 19:30:03,079 - iesa_input_entry_operator - INFO - IESA Input Entry Operator page loaded
+2025-10-27 19:30:03,083 - iesa_input_entry_operator - INFO - User selected input type: Energy Data
+2025-10-27 19:30:03,083 - iesa_input_entry_operator - INFO - User selected input type: Energy Data
+2025-10-27 19:30:03,087 - iesa_input_entry_operator - INFO - User logged out from Input Entry Operator
+2025-10-27 19:30:03,087 - iesa_input_entry_operator - INFO - User logged out from Input Entry Operator
+2025-10-27 19:30:06,511 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:06,877 - iesa_login - INFO - Login form loaded. Username field: , Password field: 
+2025-10-27 19:30:12,257 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:12,257 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:12,264 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: 
+2025-10-27 19:30:12,264 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: 
+2025-10-27 19:30:12,908 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:12,908 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:12,908 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:12,914 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: ***
+2025-10-27 19:30:12,914 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: ***
+2025-10-27 19:30:12,914 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: ***
+2025-10-27 19:30:13,002 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:13,002 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:13,002 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:13,002 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 19:30:13,009 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: ***
+2025-10-27 19:30:13,009 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: ***
+2025-10-27 19:30:13,009 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: ***
+2025-10-27 19:30:13,009 - iesa_login - INFO - Login form loaded. Username field: energyplanner@iesa, Password field: ***
+2025-10-27 19:30:13,011 - iesa_login - INFO - Login attempt for username: energyplanner@iesa
+2025-10-27 19:30:13,011 - iesa_login - INFO - Login attempt for username: energyplanner@iesa
+2025-10-27 19:30:13,011 - iesa_login - INFO - Login attempt for username: energyplanner@iesa
+2025-10-27 19:30:13,011 - iesa_login - INFO - Login attempt for username: energyplanner@iesa
+2025-10-27 19:30:13,078 - iesa_login - INFO - Successful login for user: energyplanner@iesa
+2025-10-27 19:30:13,078 - iesa_login - INFO - Successful login for user: energyplanner@iesa
+2025-10-27 19:30:13,078 - iesa_login - INFO - Successful login for user: energyplanner@iesa
+2025-10-27 19:30:13,078 - iesa_login - INFO - Successful login for user: energyplanner@iesa
+2025-10-27 19:30:13,080 - iesa_login - INFO - Redirecting user energyplanner@iesa to data planner page
+2025-10-27 19:30:13,080 - iesa_login - INFO - Redirecting user energyplanner@iesa to data planner page
+2025-10-27 19:30:13,080 - iesa_login - INFO - Redirecting user energyplanner@iesa to data planner page
+2025-10-27 19:30:13,080 - iesa_login - INFO - Redirecting user energyplanner@iesa to data planner page
+2025-10-27 19:30:18,187 - iesa_data_planner - INFO - IESA Data Planner page loaded
+2025-10-27 19:30:18,366 - iesa_data_planner - INFO - Fetched tables: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:30:18,385 - iesa_data_planner - INFO - Fetched data for table: annual_electricity_data, 17 rows
+2025-10-27 19:30:30,397 - iesa_data_planner - INFO - IESA Data Planner page loaded
+2025-10-27 19:30:30,397 - iesa_data_planner - INFO - IESA Data Planner page loaded
+2025-10-27 19:30:30,420 - iesa_data_planner - INFO - Fetched tables: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:30:30,420 - iesa_data_planner - INFO - Fetched tables: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:30:30,434 - iesa_data_planner - INFO - Fetched data for table: annual_electricity_data, 17 rows
+2025-10-27 19:30:30,434 - iesa_data_planner - INFO - Fetched data for table: annual_electricity_data, 17 rows
+2025-10-27 19:30:31,996 - iesa_data_planner - INFO - IESA Data Planner page loaded
+2025-10-27 19:30:31,996 - iesa_data_planner - INFO - IESA Data Planner page loaded
+2025-10-27 19:30:31,996 - iesa_data_planner - INFO - IESA Data Planner page loaded
+2025-10-27 19:30:31,999 - iesa_data_planner - INFO - User navigated to Dashboard page from Data Planner
+2025-10-27 19:30:31,999 - iesa_data_planner - INFO - User navigated to Dashboard page from Data Planner
+2025-10-27 19:30:31,999 - iesa_data_planner - INFO - User navigated to Dashboard page from Data Planner
+2025-10-27 19:30:37,461 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:30:37,603 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1146 (42S02): Table 'iesa_db.total_energy' doesn't exist
+2025-10-27 19:30:37,628 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2025-10-27 19:30:38,126 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2025-10-27 19:31:19,445 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:31:19,445 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:31:26,668 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:31:26,668 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:31:26,668 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:03,312 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:03,312 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:03,312 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:03,312 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:35,399 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:35,399 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:35,399 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:35,399 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:35,399 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:58,559 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:58,559 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:58,559 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:58,559 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:58,559 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:58,559 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-10-27 19:32:58,561 - iesa_dashboard - INFO - User navigated to Scenario Analysis page from Dashboard
+2025-10-27 19:32:58,561 - iesa_dashboard - INFO - User navigated to Scenario Analysis page from Dashboard
+2025-10-27 19:32:58,561 - iesa_dashboard - INFO - User navigated to Scenario Analysis page from Dashboard
+2025-10-27 19:32:58,561 - iesa_dashboard - INFO - User navigated to Scenario Analysis page from Dashboard
+2025-10-27 19:32:58,561 - iesa_dashboard - INFO - User navigated to Scenario Analysis page from Dashboard
+2025-10-27 19:32:58,561 - iesa_dashboard - INFO - User navigated to Scenario Analysis page from Dashboard
+2025-10-27 19:34:59,885 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:35:05,051 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:35:05,051 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:36:00,436 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:36:00,436 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:36:00,436 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:36:37,662 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:36:37,662 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:36:37,662 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:36:37,662 - iesa_wisdom_mining - INFO - IESA Wisdom Mining page loaded
+2025-10-27 19:36:37,665 - iesa_wisdom_mining - INFO - User navigated to Prediction Engine page from Wisdom Mining
+2025-10-27 19:36:37,665 - iesa_wisdom_mining - INFO - User navigated to Prediction Engine page from Wisdom Mining
+2025-10-27 19:36:37,665 - iesa_wisdom_mining - INFO - User navigated to Prediction Engine page from Wisdom Mining
+2025-10-27 19:36:37,665 - iesa_wisdom_mining - INFO - User navigated to Prediction Engine page from Wisdom Mining
+2025-10-27 19:36:43,423 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:43,529 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:43,531 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:46,760 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:46,760 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:46,777 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:46,777 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:46,779 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:46,779 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:47,317 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:47,317 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:47,317 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:47,332 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:47,332 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:47,332 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:47,335 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:47,335 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:47,335 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:47,350 - iesa_prediction_engine - INFO - Linear Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:47,350 - iesa_prediction_engine - INFO - Linear Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:47,350 - iesa_prediction_engine - INFO - Linear Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:51,967 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:51,967 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:51,967 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:51,967 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:51,985 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:51,985 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:51,985 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:51,985 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:51,988 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:51,988 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:51,988 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:51,988 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:52,085 - iesa_prediction_engine - INFO - Polynomial Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:52,085 - iesa_prediction_engine - INFO - Polynomial Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:52,085 - iesa_prediction_engine - INFO - Polynomial Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:52,085 - iesa_prediction_engine - INFO - Polynomial Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:55,014 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:55,014 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:55,014 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:55,014 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:55,014 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:55,028 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:55,028 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:55,028 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:55,028 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:55,028 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:55,030 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:55,030 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:55,030 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:55,030 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:55,030 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:55,139 - iesa_prediction_engine - INFO - Random Forest Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:55,139 - iesa_prediction_engine - INFO - Random Forest Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:55,139 - iesa_prediction_engine - INFO - Random Forest Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:55,139 - iesa_prediction_engine - INFO - Random Forest Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:55,139 - iesa_prediction_engine - INFO - Random Forest Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:57,533 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:57,533 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:57,533 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:57,533 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:57,533 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:57,533 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:36:57,552 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:57,552 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:57,552 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:57,552 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:57,552 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:57,552 - iesa_prediction_engine - INFO - Fetched tables for sidebar: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2025-10-27 19:36:57,554 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:57,554 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:57,554 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:57,554 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:57,554 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:57,554 - iesa_prediction_engine - INFO - User selected table: annual_electricity_data
+2025-10-27 19:36:57,692 - iesa_prediction_engine - INFO - SVR Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:57,692 - iesa_prediction_engine - INFO - SVR Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:57,692 - iesa_prediction_engine - INFO - SVR Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:57,692 - iesa_prediction_engine - INFO - SVR Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:57,692 - iesa_prediction_engine - INFO - SVR Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:36:57,692 - iesa_prediction_engine - INFO - SVR Regression run: Table=annual_electricity_data, X=Year, Y=Installed Capacity (MW)
+2025-10-27 19:37:22,174 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:37:22,174 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:37:22,174 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:37:22,174 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:37:22,174 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:37:22,174 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:37:22,174 - iesa_prediction_engine - INFO - IESA Prediction Engine page loaded
+2025-10-27 19:37:22,178 - iesa_prediction_engine - INFO - User navigated to IESA Assistant page from Prediction Engine
+2025-10-27 19:37:22,178 - iesa_prediction_engine - INFO - User navigated to IESA Assistant page from Prediction Engine
+2025-10-27 19:37:22,178 - iesa_prediction_engine - INFO - User navigated to IESA Assistant page from Prediction Engine
+2025-10-27 19:37:22,178 - iesa_prediction_engine - INFO - User navigated to IESA Assistant page from Prediction Engine
+2025-10-27 19:37:22,178 - iesa_prediction_engine - INFO - User navigated to IESA Assistant page from Prediction Engine
+2025-10-27 19:37:22,178 - iesa_prediction_engine - INFO - User navigated to IESA Assistant page from Prediction Engine
+2025-10-27 19:37:22,178 - iesa_prediction_engine - INFO - User navigated to IESA Assistant page from Prediction Engine
+2025-10-27 19:37:27,849 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:37:29,204 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:37:29,215 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 19:37:35,244 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:37:35,244 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:37:35,268 - iesa_personalized_recommendations - INFO - User sent chat message: hello
+2025-10-27 19:37:35,268 - iesa_personalized_recommendations - INFO - User sent chat message: hello
+2025-10-27 19:37:38,830 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:37:38,830 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:37:38,830 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:37:38,860 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:37:38,860 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:37:38,860 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:37:38,870 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 19:37:38,870 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 19:37:38,870 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 19:38:09,038 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:09,038 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:09,038 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:09,038 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:09,059 - iesa_personalized_recommendations - INFO - User sent chat message: give me a breif overview from 2010 to 2012 for elcetrcity
+2025-10-27 19:38:09,059 - iesa_personalized_recommendations - INFO - User sent chat message: give me a breif overview from 2010 to 2012 for elcetrcity
+2025-10-27 19:38:09,059 - iesa_personalized_recommendations - INFO - User sent chat message: give me a breif overview from 2010 to 2012 for elcetrcity
+2025-10-27 19:38:09,059 - iesa_personalized_recommendations - INFO - User sent chat message: give me a breif overview from 2010 to 2012 for elcetrcity
+2025-10-27 19:38:14,157 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:14,157 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:14,157 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:14,157 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:14,157 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-10-27 19:38:14,194 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:38:14,194 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:38:14,194 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:38:14,194 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:38:14,194 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-10-27 19:38:14,207 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 19:38:14,207 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 19:38:14,207 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 19:38:14,207 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 19:38:14,207 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-10-27 20:07:51,392 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 20:07:51,392 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 20:07:51,392 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 20:07:51,392 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 20:07:51,392 - iesa_login - INFO - IESA Login page loaded
+2025-10-27 20:07:51,474 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 20:07:51,474 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 20:07:51,474 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 20:07:51,474 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***
+2025-10-27 20:07:51,474 - iesa_login - INFO - Login form loaded. Username field: inputentryoperator@iesa, Password field: ***

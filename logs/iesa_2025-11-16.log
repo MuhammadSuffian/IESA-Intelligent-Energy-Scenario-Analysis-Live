@@ -1,0 +1,30 @@
+2025-11-16 16:59:25,695 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-11-16 16:59:26,383 - iesa_personalized_recommendations - INFO - Scenario category selected: Electricity
+2025-11-16 16:59:26,392 - iesa_personalized_recommendations - INFO - Scenario selected: Future Electricity Demand Growth
+2025-11-16 16:59:54,139 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-11-16 16:59:54,139 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-11-16 16:59:54,141 - iesa_personalized_recommendations - INFO - User navigated to Dashboard page from Personalized Recommendations
+2025-11-16 16:59:54,141 - iesa_personalized_recommendations - INFO - User navigated to Dashboard page from Personalized Recommendations
+2025-11-16 16:59:59,898 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:00:00,174 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1146 (42S02): Table 'iesa_db.total_energy' doesn't exist
+2025-11-16 17:00:00,190 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2025-11-16 17:00:00,670 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2025-11-16 17:00:42,091 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:00:42,091 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:00:48,019 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:00:48,019 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:00:48,019 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:01:23,712 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:01:23,712 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:01:23,712 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:01:23,712 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:24:23,253 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-11-16 17:24:23,253 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-11-16 17:24:23,253 - iesa_personalized_recommendations - INFO - IESA Personalized Recommendations page loaded
+2025-11-16 17:24:23,260 - iesa_personalized_recommendations - INFO - User navigated to Dashboard page from Personalized Recommendations
+2025-11-16 17:24:23,260 - iesa_personalized_recommendations - INFO - User navigated to Dashboard page from Personalized Recommendations
+2025-11-16 17:24:23,260 - iesa_personalized_recommendations - INFO - User navigated to Dashboard page from Personalized Recommendations
+2025-11-16 17:24:44,904 - iesa_dashboard - INFO - IESA Dashboard page loaded
+2025-11-16 17:24:45,573 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1146 (42S02): Table 'iesa_db.total_energy' doesn't exist
+2025-11-16 17:24:45,604 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2025-11-16 17:24:46,691 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
