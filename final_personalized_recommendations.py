@@ -481,7 +481,7 @@ def load_personalized_recommendations(logger):
         unsafe_allow_html=True,
     )
 
-    api_keys = ["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"]
+    api_keys = st.secrets["api_keys"]
     def get_model():
         api_index = 0
         for _ in range(len(api_keys)):

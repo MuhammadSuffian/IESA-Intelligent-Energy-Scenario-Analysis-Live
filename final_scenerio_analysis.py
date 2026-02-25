@@ -91,7 +91,7 @@ def load_scenerio_analysis(logger):
         return df
 
     # AI-powered Scenario Analysis
-    client = groq.Client(api_key="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")
+    client = groq.Client(api_key=st.secrets["api_keys"])
 
     class ScenarioAnalysisTool(Tool):
         name = "scenario_analysis"
