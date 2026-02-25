@@ -13,7 +13,5 @@ urllib3
 asyncio
 pydantic-ai
 datetime
-scikit-learn
-reportlab
 svglib
 
