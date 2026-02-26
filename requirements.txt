@@ -14,4 +14,4 @@ asyncio
 pydantic-ai
 datetime
 svglib
-
+plotly
