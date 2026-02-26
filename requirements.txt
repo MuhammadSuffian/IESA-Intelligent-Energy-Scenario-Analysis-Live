@@ -16,3 +16,4 @@ datetime
 svglib
 plotly
 streamlit-option-menu
+matplotlib
