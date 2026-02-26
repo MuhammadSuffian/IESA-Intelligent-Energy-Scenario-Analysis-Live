@@ -15,3 +15,4 @@ pydantic-ai
 datetime
 svglib
 plotly
+streamlit-option-menu
