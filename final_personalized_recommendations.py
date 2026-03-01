@@ -480,9 +480,10 @@ def load_personalized_recommendations(logger):
         """,
         unsafe_allow_html=True,
     )
-    api_keys=None
+    api_keys=0
+    st.title(st.secrets.get("msg"))
     try:
-        api_keys = st.secrets["api_keys"]
+        api_keys = st.secrets.get("api_keys")
     except Exception:
         api_keys = None
     def get_model():
