@@ -89,9 +89,13 @@ def load_scenerio_analysis(logger):
         df = pd.read_sql(query, conn)
         conn.close()
         return df
-
+    api_keys=None
+    try:
+        api_keys = st.secrets["api_keys"]
+    except Exception:
+        api_keys = None
     # AI-powered Scenario Analysis
-    client = groq.Client(api_key=st.secrets["api_keys"])
+    client = groq.Client(api_keys)
 
     class ScenarioAnalysisTool(Tool):
         name = "scenario_analysis"
