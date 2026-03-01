@@ -1,0 +1,4 @@
+2026-02-26 23:07:21,115 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-02-26 23:07:21,807 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1146 (42S02): Table 'iesa_db.total_energy' doesn't exist
+2026-02-26 23:07:21,823 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-02-26 23:07:22,207 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined

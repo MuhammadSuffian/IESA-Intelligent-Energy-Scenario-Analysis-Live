@@ -480,8 +480,11 @@ def load_personalized_recommendations(logger):
         """,
         unsafe_allow_html=True,
     )
-
-    api_keys = st.secrets["api_keys"]
+    api_keys=None
+    try:
+        api_keys = st.secrets["api_keys"]
+    except Exception:
+        api_keys = None
     def get_model():
         api_index = 0
         for _ in range(len(api_keys)):
