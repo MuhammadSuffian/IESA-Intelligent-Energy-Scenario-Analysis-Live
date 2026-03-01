@@ -481,7 +481,7 @@ def load_personalized_recommendations(logger):
         unsafe_allow_html=True,
     )
     api_key=None
-    # st.title(st.secrets.get("msg"))
+    st.title(st.secrets.get("msg"))
     try:
         api_key = st.secrets.get("api_keys")
     except Exception:
