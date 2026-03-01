@@ -483,24 +483,22 @@ def load_personalized_recommendations(logger):
     api_key=None
     st.title(st.secrets.get("msg"))
     try:
-        api_key = st.secrets.get("api_keys")
+        api_key = st.secrets.get("api_keys", "").strip()
     except Exception:
         api_key = None
 
     def get_model():
         if not api_key:
-            st.error("No API keys found in secrets!")
+            st.error("No API key found in secrets!")
             return None
         try:
             return GroqModel(
-                    'llama-3.3-70b-versatile',
+                'llama-3.3-70b-versatile',
                 provider=GroqProvider(api_key)
             )
         except Exception as e:
-            st.warning(f"API key failed: {e}")
-
-        st.error("All API keys failed!")
-        return None
+            st.error(f"API key failed: {repr(e)}")
+            return None
 
     def get_connection():
         return mysql.connector.connect(
