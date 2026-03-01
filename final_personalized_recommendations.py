@@ -592,10 +592,9 @@ def load_personalized_recommendations(logger):
 
         last_message = st.session_state.conversation_history[-1]  # Keep only the last user input
 
-        for _ in range(len(api_keys)):
-            model = get_model()
-            if model:
-                try:
+        model = get_model()
+        if model:
+            try:
                     agent = Agent(model=model)
                     
                     # Only use the last user message while keeping the full knowledge base
@@ -610,7 +609,7 @@ def load_personalized_recommendations(logger):
                     st.session_state.conversation_history.append({"role": "assistant", "content": response})
                     return response
 
-                except Exception as e:
+            except Exception as e:
                     st.warning(f"API call failed, switching API key... ({e})")
                     await asyncio.sleep(5)  # Wait before switching API key
 
