@@ -480,27 +480,24 @@ def load_personalized_recommendations(logger):
         """,
         unsafe_allow_html=True,
     )
-    api_keys=0
+    api_key=None
     # st.title(st.secrets.get("msg"))
     try:
-        api_keys = st.secrets.get("api_keys")
+        api_key = st.secrets.get("api_keys")
     except Exception:
-        api_keys = None
+        api_key = None
 
     def get_model():
-        if not api_keys:
+        if not api_key:
             st.error("No API keys found in secrets!")
             return None
-
-        for api_key in api_keys:
-            try:
-                return GroqModel(
+        try:
+            return GroqModel(
                     'llama-3.3-70b-versatile',
-                    provider=GroqProvider(api_key=api_key)
-                )
-            except Exception as e:
-                st.warning(f"API key failed: {e}")
-                continue
+                provider=GroqProvider(api_key)
+            )
+        except Exception as e:
+            st.warning(f"API key failed: {e}")
 
         st.error("All API keys failed!")
         return None
