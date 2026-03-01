@@ -91,7 +91,7 @@ def load_scenerio_analysis(logger):
         return df
     api_keys=None
     try:
-        api_keys = st.secrets["api_keys"]
+        api_keys = st.secrets.get("api_keys")
     except Exception:
         api_keys = None
     # AI-powered Scenario Analysis
