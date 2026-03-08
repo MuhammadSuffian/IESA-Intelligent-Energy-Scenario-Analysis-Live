@@ -510,7 +510,7 @@ def load_personalized_recommendations(logger):
         except Exception as e:
             print(f"An error occurred: {e}")
 
-    # fetch_data_with_sql()
+    fetch_data_with_sql()
 
     def get_model():
         if not api_key:
