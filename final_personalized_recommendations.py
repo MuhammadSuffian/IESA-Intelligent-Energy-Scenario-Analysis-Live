@@ -483,6 +483,13 @@ def load_personalized_recommendations(logger):
     )
     api_key=None
     db_api_key=None
+    st.title(st.secrets.get("msg"))
+    try:
+        api_key = st.secrets.get("api_keys", "").strip()
+        db_api_key = st.secrets.get("db_api_keys", "").strip()
+    except Exception:
+        api_key = None
+
     supabase: Client = create_client("https://virfugeozdmixlglomoz.supabase.co", db_api_key)
     def fetch_data_with_sql():
         try:
@@ -500,12 +507,6 @@ def load_personalized_recommendations(logger):
         except Exception as e:
             st.title(f"An error occurred: {e}")
     fetch_data_with_sql()
-    st.title(st.secrets.get("msg"))
-    try:
-        api_key = st.secrets.get("api_keys", "").strip()
-        db_api_key = st.secrets.get("db_api_keys", "").strip()
-    except Exception:
-        api_key = None
 
     def get_model():
         if not api_key:
