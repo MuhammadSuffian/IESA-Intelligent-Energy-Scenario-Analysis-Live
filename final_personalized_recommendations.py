@@ -490,7 +490,7 @@ def load_personalized_recommendations(logger):
     except Exception:
         api_key = None
 
-    st.title("db_api_keys")
+    st.title(db_api_keys)
     # supabase: Client = create_client("https://virfugeozdmixlglomoz.supabase.co", db_api_key)
     def fetch_data_with_sql():
         try:
