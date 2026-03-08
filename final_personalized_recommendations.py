@@ -486,6 +486,7 @@ def load_personalized_recommendations(logger):
     # st.title(st.secrets.get("db_api_key"))
     try:
         api_key = st.secrets.get("api_keys", "").strip()
+        db_api_key=st.secrets.get("db_api_key", "").strip()
     except Exception:
         api_key = None
         db_api_key=None
