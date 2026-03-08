@@ -435,13 +435,13 @@ def load_dash(logger):
         try:
             conn = get_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT SUM(energy_production) FROM total_energy WHERE year = 2022")
+            cursor.execute("select SUM(total_primary_energy_supply_mtoe) from energy_supply_and_consumption_analysis")
             total_production = cursor.fetchone()[0]
-            cursor.execute("SELECT SUM(energy_consumption) FROM total_energy WHERE year = 2022")
+            cursor.execute("select SUM(total_final_consumption_energy_mtoe) from energy_supply_and_consumption_analysis")
             total_consumption = cursor.fetchone()[0]
-            cursor.execute("SELECT SUM(electricity_production) FROM electricity_production_and_consumption WHERE year = 2022")
+            cursor.execute("select SUM(generation_gwh) from annual_electricity_data")
             electricity_production = cursor.fetchone()[0]
-            cursor.execute("SELECT SUM(gas_production) FROM natural_gas_production_and_consumption WHERE year = 2022")
+            cursor.execute("SELECT SUM(natural_gas_production) FROM natural_gas_production_and_consumption")
             gas_production = cursor.fetchone()[0]
             conn.close()
             logger.info(f"Fetched metrics: production={total_production}, consumption={total_consumption}, electricity={electricity_production}, gas={gas_production}")

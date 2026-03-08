@@ -14,6 +14,7 @@ from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
 from textwrap import wrap
 from utils.logger import setup_logger
+from supabase import create_client, Client
 
 # # Setup logger
 # logger = setup_logger("iesa_personalized_recommendations")
@@ -481,9 +482,27 @@ def load_personalized_recommendations(logger):
         unsafe_allow_html=True,
     )
     api_key=None
+    db_api_key=None
+    supabase: Client = create_client("https://virfugeozdmixlglomoz.supabase.co", db_api_key)
+    def fetch_data_with_sql():
+        try:
+            # Call the PostgreSQL function using rpc()
+            response = supabase.rpc('get_all_items').execute()
+
+            # Handle the response
+            if response.data:
+                st.title("Data fetched successfully:")
+                for item in response.data:
+                    st.title(item)
+            else:
+                st.title("No data returned or an error occurred.")
+
+        except Exception as e:
+            st.title(f"An error occurred: {e}")
     st.title(st.secrets.get("msg"))
     try:
         api_key = st.secrets.get("api_keys", "").strip()
+        db_api_key = st.secrets.get("db_api_keys", "").strip()
     except Exception:
         api_key = None
 
