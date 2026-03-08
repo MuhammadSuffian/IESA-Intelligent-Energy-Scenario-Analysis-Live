@@ -508,7 +508,7 @@ def load_personalized_recommendations(logger):
                  st.title("No data returned or an error occurred.")
 
         except Exception as e:
-            print(f"An error occurred: {e}")
+            st.title(f"An error occurred: {e}")
 
     fetch_data_with_sql()
 
