@@ -499,6 +499,7 @@ def load_personalized_recommendations(logger):
 
         except Exception as e:
             st.title(f"An error occurred: {e}")
+    fetch_data_with_sql()
     st.title(st.secrets.get("msg"))
     try:
         api_key = st.secrets.get("api_keys", "").strip()
