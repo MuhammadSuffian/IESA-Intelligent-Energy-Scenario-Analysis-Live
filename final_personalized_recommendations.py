@@ -14,7 +14,7 @@ from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
 from textwrap import wrap
 from utils.logger import setup_logger
-# from supabase import create_client, Client
+from supabase import create_client, Client
 
 # # Setup logger
 # logger = setup_logger("iesa_personalized_recommendations")
