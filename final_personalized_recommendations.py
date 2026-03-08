@@ -490,7 +490,8 @@ def load_personalized_recommendations(logger):
     except Exception:
         api_key = None
 
-    supabase: Client = create_client("https://virfugeozdmixlglomoz.supabase.co", db_api_key)
+    st.title("db_api_keys")
+    # supabase: Client = create_client("https://virfugeozdmixlglomoz.supabase.co", db_api_key)
     def fetch_data_with_sql():
         try:
             # Call the PostgreSQL function using rpc()
@@ -506,7 +507,7 @@ def load_personalized_recommendations(logger):
 
         except Exception as e:
             st.title(f"An error occurred: {e}")
-    fetch_data_with_sql()
+    # fetch_data_with_sql()
 
     def get_model():
         if not api_key:
