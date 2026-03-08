@@ -14,7 +14,7 @@ from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
 from textwrap import wrap
 from utils.logger import setup_logger
-from supabase import create_client, Client
+# from supabase import create_client, Client
 
 # # Setup logger
 # logger = setup_logger("iesa_personalized_recommendations")
@@ -490,7 +490,7 @@ def load_personalized_recommendations(logger):
         api_key = None
         db_api_key=None
 
-    SUPABASE_URL = "https://virfugeozdmixlglomoz.supabase.co"
+    # SUPABASE_URL = "https://virfugeozdmixlglomoz.supabase.co"
     # supabase: Client = create_client(SUPABASE_URL, db_api_key)
 
     # def fetch_data_with_sql():
