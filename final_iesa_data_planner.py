@@ -1307,8 +1307,10 @@ from utils.logger import setup_logger
 
 def get_supabase_creds():
     """Read Supabase credentials from Streamlit secrets."""
-    url = st.secrets["db_url"].rstrip("/")
+    url = st.secrets["db_url"]
+    st.title(url)
     api_key = st.secrets["db_api_key"]
+    st.title(api_key)
     return url, api_key
 
 
