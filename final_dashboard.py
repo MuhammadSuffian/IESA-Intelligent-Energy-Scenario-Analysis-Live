@@ -331,14 +331,13 @@ def load_dash(logger):
         try:
             image = Image.open('images/iesa_green.png')
             st.image("images/iesa_white.svg", width=200)
-            st.toast("Hello Suffian")
         except Exception as e:
             st.sidebar.title("IESA Dashboard")
         st.sidebar.markdown("""
         <h2>Dashboard</h2>
     """,unsafe_allow_html=True)
         # st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
-        
+        st.toast("Hello Suffian there??")
         # Side navigation menu
         selected = option_menu(
         menu_title="Dashboard Navigation",
