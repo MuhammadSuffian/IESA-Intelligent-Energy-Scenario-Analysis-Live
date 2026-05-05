@@ -58,7 +58,7 @@ st.set_page_config(
 # --- Navigation Menu ---
 selected = option_menu(
     menu_title=None,
-    options=["Dashboard", "Data Planner", "Scenario", "Wisdom Mining", "Prediction", "IESA Assistant"],
+    options=["Dashboard11", "Data Planner", "Scenario", "Wisdom Mining", "Prediction", "IESA Assistant"],
     icons=["clipboard-data", "bar-chart", "graph-up", "graph-up-arrow", "robot", "robot"],
     default_index=0,
     orientation="horizontal",
