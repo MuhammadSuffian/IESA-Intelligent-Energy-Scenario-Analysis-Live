@@ -318,7 +318,7 @@ def load_dash(logger):
     #     # set_bg_from_local("images/background.jpg")
     # except Exception as e:
         # If background image fails to load, use a gradient background
-    st.markdown("""
+        st.markdown("""
         <style>
         .stApp {
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
