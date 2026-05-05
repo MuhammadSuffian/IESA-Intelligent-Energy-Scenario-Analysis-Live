@@ -328,6 +328,7 @@ def load_dash(logger):
 
     # Sidebar with IESA logo
     with st.sidebar:
+        st.toast("Hello")
         try:
             image = Image.open('images/iesa_green.png')
             st.image("images/iesa_white.svg", width=200)
