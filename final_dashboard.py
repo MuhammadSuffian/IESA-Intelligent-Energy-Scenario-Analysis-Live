@@ -328,10 +328,10 @@ def load_dash(logger):
 
     # Sidebar with IESA logo
     with st.sidebar:
-        st.toast("Hello")
         try:
             image = Image.open('images/iesa_green.png')
             st.image("images/iesa_white.svg", width=200)
+            st.toast("Hello")
         except Exception as e:
             st.sidebar.title("IESA Dashboard")
         st.sidebar.markdown("""
