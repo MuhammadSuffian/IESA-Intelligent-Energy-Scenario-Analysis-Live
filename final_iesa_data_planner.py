@@ -1307,10 +1307,8 @@ from utils.logger import setup_logger
 
 def get_supabase_creds():
     """Read Supabase credentials from Streamlit secrets."""
-    url = st.secrets["db_url"]
-    st.title(url)
+    url = st.secrets["db_url"].rstrip("/")
     api_key = st.secrets["db_api_key"]
-    st.title(api_key)
     return url, api_key
 
 
@@ -1363,24 +1361,53 @@ def fetch_supabase_rest(sql: str) -> pd.DataFrame:
 
 def fetch_tables() -> list[str]:
     """
-    Return all table names from the public schema via Supabase REST.
-    Uses the PostgREST /rest/v1/ root which lists available resources,
-    or falls back to the information_schema via RPC if available.
+    Return all user table names in the public schema.
+
+    Strategy (tries each in order until one succeeds):
+    1. Query information_schema.tables via PostgREST — works when the
+       anon role has SELECT on that view (common Supabase default).
+    2. Parse the OpenAPI spec from /rest/v1/ with Accept: application/json.
+    3. Return an empty list and surface the last error as a toast.
     """
     url, api_key = get_supabase_creds()
     headers = supabase_headers(api_key)
+    last_err = None
+
+    # ── Strategy 1: information_schema.tables via REST ─────────────────────
     try:
-        # PostgREST exposes an OpenAPI spec at /rest/v1/ — parse it for table names
-        resp = requests.get(f"{url}/rest/v1/", headers=headers, timeout=10)
+        endpoint = f"{url}/rest/v1/information_schema.tables"
+        params = {
+            "select": "table_name",
+            "table_schema": "eq.public",
+            "table_type": "eq.BASE TABLE",
+        }
+        resp = requests.get(endpoint, headers=headers, params=params, timeout=10)
+        resp.raise_for_status()
+        rows = resp.json()
+        if isinstance(rows, list) and rows:
+            return sorted(r["table_name"] for r in rows)
+    except Exception as e:
+        last_err = e
+
+    # ── Strategy 2: OpenAPI spec at /rest/v1/ ──────────────────────────────
+    try:
+        spec_headers = {**headers, "Accept": "application/json"}
+        resp = requests.get(f"{url}/rest/v1/", headers=spec_headers, timeout=10)
         resp.raise_for_status()
         spec = resp.json()
-        # The "paths" key contains entries like "/table_name"
         paths = spec.get("paths", {})
-        tables = [p.lstrip("/") for p in paths if p.startswith("/") and not p.startswith("/rpc")]
-        return sorted(tables)
+        tables = [
+            p.lstrip("/")
+            for p in paths
+            if p.startswith("/") and not p.startswith("/rpc")
+        ]
+        if tables:
+            return sorted(tables)
     except Exception as e:
-        st.toast(f"Error fetching tables: {e}", icon="❌")
-        return []
+        last_err = e
+
+    st.toast(f"Error fetching tables: {last_err}", icon="❌")
+    return []
 
 
 def fetch_table_data(table_name: str) -> pd.DataFrame:
