@@ -18,3 +18,4 @@ plotly
 streamlit-option-menu
 matplotlib
 supabase
+psycopg2-binary
