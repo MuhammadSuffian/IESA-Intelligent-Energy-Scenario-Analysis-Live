@@ -1680,7 +1680,7 @@ def load_wisdom_mining(logger):
         return transactions
 
     # ── Main logic ─────────────────────────────────────────────────────────────
-    available_tables = fetch_tables()
+    available_tables = ["annual_electricity_data","electricity_consumption_by_sector_gwh","energy_supply_and_consumption_analysis","final_energy_consumption_by_source_toe","natural_gas_production_and_consumption","primary_energy_supplies_by_source_toe","province_wise_electricity_consumption_gwh","province_wise_energy_consumption","provincial_energy_distribution_and_transmission_losses","scenario_definitions","sector_wise_energy_consumption","total_imports_lng","total_proved_reserves"]
     if not available_tables:
         st.sidebar.error("No tables found in database")
     else:
