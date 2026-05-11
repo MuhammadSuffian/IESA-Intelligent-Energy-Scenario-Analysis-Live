@@ -1312,19 +1312,19 @@ def load_personalized_recommendations(logger):
     # ── Model ──────────────────────────────────────────────────────────────────
     def get_model():
         try:
-            api_key = st.secrets["api_keys"]  # adjust key name to match your secrets
+            api_key = st.secrets["api_keys"].strip()
         except KeyError as e:
             st.error(f"Secret not found: {e}. Check your secrets.toml key name.")
             return None
 
-        if not api_key or not api_key.strip():
+        if not api_key:
             st.error("API key is empty. Check your Streamlit secrets.")
             return None
 
         try:
             return GroqModel(
                 'llama-3.3-70b-versatile',
-                provider=GroqProvider(api_key=api_key.strip())
+                provider=GroqProvider(api_key=api_key)   # ✅ keyword argument
             )
         except Exception as e:
             st.error(f"Failed to initialise GroqModel: {repr(e)}")
