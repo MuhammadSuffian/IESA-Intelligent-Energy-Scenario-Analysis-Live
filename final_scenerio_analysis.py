@@ -1,6 +1,905 @@
+# import streamlit as st
+# import pandas as pd
+# import mysql.connector
+# import groq
+# import altair as alt
+# from streamlit_option_menu import option_menu
+# from smolagents import Tool
+# from sklearn.cluster import KMeans
+# from sklearn.preprocessing import StandardScaler
+# import numpy as np
+# from sklearn.decomposition import PCA
+# import os
+
+# def load_scenerio_analysis(logger):
+
+#     # Initialize sidebar state
+#     if 'sidebar_state' not in st.session_state:
+#         st.session_state.sidebar_state = 'expanded'
+#     if 'button_text' not in st.session_state:
+#         st.session_state.button_text = '← Hide'
+#     if 'previous_scenarios' not in st.session_state:
+#         st.session_state.previous_scenarios = []
+#     if 'should_rerun' not in st.session_state:
+#         st.session_state.should_rerun = False
+#     if 'scenario_analyses' not in st.session_state:
+#         st.session_state.scenario_analyses = {}
+#     if 'toggle_triggered' not in st.session_state:
+#         st.session_state.toggle_triggered = False
+#     if 'rendered_charts' not in st.session_state:
+#         st.session_state.rendered_charts = {}
+#     if 'chart_keys' not in st.session_state:
+#         st.session_state.chart_keys = set()
+#     if 'current_action' not in st.session_state:
+#         st.session_state.current_action = None
+#     # New clustering state variables
+#     if 'clustering_results' not in st.session_state:
+#         st.session_state.clustering_results = {}
+#     if 'selected_features' not in st.session_state:
+#         st.session_state.selected_features = []
+#     if 'num_clusters' not in st.session_state:
+#         st.session_state.num_clusters = 3
+        
+#     # Function to toggle sidebar
+#     def toggle_sidebar():
+#         if st.session_state.sidebar_state == 'expanded':
+#             st.session_state.sidebar_state = 'collapsed'
+#             st.session_state.button_text = '→ Show'
+#         else:
+#             st.session_state.sidebar_state = 'expanded'
+#             st.session_state.button_text = '← Hide'
+#         st.session_state.should_rerun = True
+#         st.session_state.toggle_triggered = True
+
+#     # Function to auto-hide sidebar
+#     def auto_hide_sidebar():
+#         st.session_state.sidebar_state = 'collapsed'
+#         st.session_state.button_text = '→ Show'
+#         st.session_state.should_rerun = True
+#         st.session_state.toggle_triggered = False
+
+#     # Function to auto-hide sidebar without rerunning
+#     def auto_hide_sidebar_no_rerun():
+#         st.session_state.sidebar_state = 'collapsed'
+#         st.session_state.button_text = '→ Show'
+#         st.session_state.toggle_triggered = False
+
+
+#     # Database connection
+#     def get_connection():
+#         return mysql.connector.connect(
+#             host="localhost",
+#             port="3306",
+#             user="root",
+#             passwd="admin123",
+#             db="iesa_db"
+#         )
+
+#     # Fetch Scenarios from Database
+#     def fetch_scenarios():
+#         conn = get_connection()
+#         query = "SELECT category, scenario FROM scenario_definitions;"
+#         df = pd.read_sql(query, conn)
+#         conn.close()
+#         return df
+
+#     # Fetch predefined query results
+#     def fetch_data(query):
+#         conn = get_connection()
+#         df = pd.read_sql(query, conn)
+#         conn.close()
+#         return df
+#     api_keys=None
+#     try:
+#         api_keys = st.secrets.get("api_keys")
+#     except Exception:
+#         api_keys = None
+#     # AI-powered Scenario Analysis
+#     client = groq.Client(api_keys)
+
+#     class ScenarioAnalysisTool(Tool):
+#         name = "scenario_analysis"
+#         description = "Analyzes a generated scenario and provides structured insights."
+#         inputs = {
+#             "scenario": {"type": "string", "description": "Scenario title."},
+#             "data_string": {"type": "string", "description": "String representation of the dataset."}
+#         }
+#         output_type = "string"
+
+#         def forward(self, scenario: str, data_string: str):
+#             prompt = (f"Analyze the following dataset based on actual trends:\n\n"
+#                     f"{data_string}\n\n"
+#                     f"Scenario: {scenario}\n\n"
+#                     "Provide a concise yet informative analysis with 2-3 main sections. Each section should have a clear heading and 2-3 bullet points with specific insights. Focus exclusively on the data provided.\n\n"
+#                     "Format your response as follows:\n\n"
+#                     "## Key Trend Analysis\n"
+#                     "- Include specific numbers and percentages from the data\n"
+#                     "- Highlight the most significant pattern observed\n\n"
+#                     "## Impact Assessment\n"
+#                     "- Describe direct implications based on the data\n"
+#                     "- Use comparative analysis when relevant\n\n"
+#                     "Keep each bullet point concise but informative with data-backed observations.")
+
+#             response = client.chat.completions.create(
+#                 model="llama-3.3-70b-versatile",
+#                 messages=[{"role": "user", "content": prompt}]
+#             )
+            
+#             return response.choices[0].message.content.strip()
+
+#     # Function to perform K-means clustering
+#     def perform_kmeans_clustering(data, features, n_clusters=3):
+#         """
+#         Perform K-means clustering on selected features
+        
+#         Args:
+#             data: DataFrame containing the data
+#             features: List of column names to use for clustering
+#             n_clusters: Number of clusters to form
+        
+#         Returns:
+#             Dictionary containing:
+#             - 'data': Original data with cluster assignments
+#             - 'centers': Cluster centers
+#             - 'inertia': Sum of squared distances of samples to their closest cluster center
+#             - 'pca_data': PCA-transformed data for visualization (if >2 dimensions)
+#             - 'pca_centers': PCA-transformed cluster centers (if >2 dimensions)
+#         """
+#         # Select only numeric features and drop rows with missing values
+#         X = data[features].dropna()
+        
+#         # Store index mapping between X and original data
+#         index_mapping = {i: idx for i, idx in enumerate(X.index)}
+        
+#         # Standardize the features
+#         scaler = StandardScaler()
+#         X_scaled = scaler.fit_transform(X)
+        
+#         # Apply K-means clustering
+#         kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+#         cluster_labels = kmeans.fit_predict(X_scaled)
+        
+#         # Add cluster labels to the data
+#         clustered_data = data.copy()
+#         clustered_data.loc[X.index, 'Cluster'] = cluster_labels
+        
+#         # For visualization, apply PCA if more than 2 features
+#         if len(features) > 2:
+#             pca = PCA(n_components=2)
+#             pca_result = pca.fit_transform(X_scaled)
+#             pca_centers = pca.transform(scaler.transform(kmeans.cluster_centers_))
+            
+#             # Create DataFrame for PCA results
+#             pca_df = pd.DataFrame(
+#                 data=pca_result,
+#                 columns=['PC1', 'PC2']
+#             )
+#             pca_df['Cluster'] = cluster_labels
+#             pca_df['Year'] = X.index.map(lambda idx: data.loc[idx, 'Year'])
+            
+#             explained_variance = pca.explained_variance_ratio_
+#         else:
+#             pca_df = None
+#             pca_centers = None
+#             explained_variance = None
+        
+#         return {
+#             'data': clustered_data,
+#             'centers': kmeans.cluster_centers_,
+#             'inertia': kmeans.inertia_,
+#             'pca_data': pca_df,
+#             'pca_centers': pca_centers,
+#             'explained_variance': explained_variance,
+#             'features': features,
+#             'scaler': scaler
+#         }
+
+#     # Function to create cluster visualization
+#     def create_cluster_chart(cluster_results, original_features):
+#         """Create Altair visualization for clusters"""
+#         if len(original_features) <= 2:
+#             # Direct visualization using original features
+#             plot_df = cluster_results['data'].dropna(subset=['Cluster'])
+#             x_col = original_features[0]
+#             y_col = original_features[1] if len(original_features) > 1 else original_features[0]
+            
+#             # Create the scatter plot
+#             scatter = alt.Chart(plot_df).mark_circle(size=80).encode(
+#                 x=alt.X(f'{x_col}:Q', title=x_col),
+#                 y=alt.Y(f'{y_col}:Q', title=y_col),
+#                 color=alt.Color('Cluster:N', scale=alt.Scale(scheme='category10'),
+#                             legend=alt.Legend(title="Cluster")),
+#                 tooltip=['Year', x_col, y_col, 'Cluster']
+#             ).properties(
+#                 width=600,
+#                 height=400,
+#                 title=f'Clusters based on {", ".join(original_features)}'
+#             )
+            
+#             return scatter
+
+#         else:
+#             # Use PCA results for visualization
+#             pca_df = cluster_results['pca_data']
+            
+#             # Add a title with explained variance
+#             ev = cluster_results['explained_variance']
+#             title = f'Clusters based on {len(original_features)} features (PCA: {ev[0]:.1%}, {ev[1]:.1%} variance explained)'
+            
+#             # Create scatter plot with PCA components
+#             scatter = alt.Chart(pca_df).mark_circle(size=80).encode(
+#                 x=alt.X('PC1:Q', title='Principal Component 1'),
+#                 y=alt.Y('PC2:Q', title='Principal Component 2'),
+#                 color=alt.Color('Cluster:N', scale=alt.Scale(scheme='category10'),
+#                             legend=alt.Legend(title="Cluster")),
+#                 tooltip=['Year', 'PC1', 'PC2', 'Cluster']
+#             ).properties(
+#                 width=600,
+#                 height=400,
+#                 title=title
+#             )
+            
+#             return scatter
+
+#     # CSS and JavaScript for dynamic button states
+#     st.markdown("""
+#         <style>
+#         /* General Styling */
+#         header {
+#             border-bottom: 3px solid  #136a8a !important; 
+#             margin-bottom: 0 !important;
+#             position: relative !important;
+#             z-index: 99 !important;
+#             height: 2.5rem !important;
+#         }
+#         [data-testid="stSidebar"] {
+#             background: linear-gradient(135deg, #73C8A9, #0b8793); /* Gradient background */
+#             color: white;
+#             margin-top:-10px;
+#             box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+#             z-index: 98;
+#         }
+#         .sidebar-content {
+#             margin-top: -60px;
+#             padding: 20px;
+#         }
+        
+#         /* Navigation bar styling - remove borders except bottom */
+#         [data-baseweb="tab-list"] {
+#             border-top: none !important;
+#             border-left: none !important;
+#             border-right: none !important;
+#             border-bottom: 2px solid #e0e5eb !important;
+#             background-color: transparent !important;
+#         }
+        
+#         /* Remove any backgrounds */
+#         .stTabs {
+#             background-color: transparent !important;
+#         }
+        
+#         .stTabs [data-baseweb="tab-list"] {
+#             background-color: transparent !important;
+#         }
+        
+#         .stTabs [data-baseweb="tab"] {
+#             background-color: transparent !important;
+#         }
+        
+#         /* Add bottom bar to active navigation item */
+#         .nav-link-selected::after {
+#             content: '' !important;
+#             position: absolute !important;
+#             bottom: -3px !important;
+#             left: 10% !important;
+#             width: 80% !important;
+#             height: 4px !important;
+#             background-color: #73c8a9 !important; 
+#             border-radius: 2px !important;
+#             transition: all 0.3s ease !important;
+#             box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+#         }
+        
+#         /* Make the active tab text color the original color */
+#         .nav-link-selected {
+#             color: #106466 !important; 
+#             font-weight: bold !important;
+#         }
+        
+#         /* Remove grey background from navigation container */
+#         section[data-testid="stSectionContainer"] div[data-testid="stVerticalBlock"] {
+#             background-color: transparent !important;
+#         }
+        
+#         /* Remove extra spacing at the top */
+#         .block-container {
+#             padding-top: 0.1rem !important;
+#         }
+        
+#         /* Main wrapper for streamlit app */
+#         .main .block-container {
+#             padding-top: 0.5rem !important;
+#             margin-top: 0 !important;
+#         }
+        
+#         /* Fix for option menu container positioning */
+#         section[data-testid="stSectionContainer"] {
+#             position: relative;
+#             z-index: 100;
+#         }
+        
+#         /* Toggle button styles */
+#         div[data-testid="stHorizontalBlock"] > div:first-child button {
+#             background-color: #0b8793;
+#             color: white !important;
+#             border: 1px solid #4AC29A;
+#             border-radius: 5px;
+#             padding: 8px 15px;
+#             font-weight: bold;
+#             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+#             transition: all 0.3s ease;
+#         }
+
+#         div[data-testid="stHorizontalBlock"] > div:first-child button:hover {
+#             background-color: #4AC29A;
+#             transform: translateY(-1px);
+#             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+#         }
+        
+#         [data-testid="stSidebar"] h2 {
+#             font-size: 22px !important;
+#             margin-top: 25px !important;
+#             margin-bottom: 15px !important;
+#             padding-bottom: 5px;
+#             border-bottom: 2px solid rgba(255,255,255,0.3);
+#             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+#         }
+        
+#         [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
+#             color: rgba(255,255,255,0.9) !important;
+#             font-weight: 500;
+#             margin-bottom: 8px;
+#             font-size: 15px;
+#         }
+        
+#         [data-testid="stSidebar"] .stSelectbox > div, [data-testid="stSidebar"] .stMultiSelect > div {
+#             background-color: rgba(255,255,255,0.1) !important;
+#             border: 1px solid rgba(255,255,255,0.2) !important;
+#             border-radius: 5px;
+#             color: white !important;
+#             margin-bottom: 15px;
+#         }
+        
+#         [data-testid="stSidebar"] .stSelectbox > div:hover, [data-testid="stSidebar"] .stMultiSelect > div:hover {
+#             border: 1px solid rgba(255,255,255,0.4) !important;
+#         }
+        
+#         [data-testid="stSidebar"] span[data-baseweb="tag"] {
+#             background-color: #73C8A9 !important;
+#             border: none !important;
+#         }
+        
+#         .logo-title-container {
+#             display: flex;
+#             flex-direction: row;
+#             align-items: center;
+#             justify-content: space-between;
+#         }
+#         .logo img {
+#             width: 60px;
+#             border-radius: 50%;
+#         }
+#         .app-name {
+#             font-size: 1.5em;
+#             font-weight: bold;
+#         }
+    
+    
+#         .stButton button {
+#             width:100%;
+#             background-color: #0b8793;
+#             color: white !important;
+#             border: 1px solid #4AC29A;
+#             border-radius: 5px;
+#             font-size: 0.9em;
+#             font-weight: bold;
+#             padding: 8px 20px;
+#             cursor: pointer;
+#             transition: all 0.3s ease;
+#             margin-bottom: 10px;
+#             letter-spacing: 0.3px;
+#             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+#         }
+
+#         .stButton button:hover {
+#             background-color: #4AC29A;
+#             color: white !important;
+#             box-shadow: 0 3px 7px rgba(0,0,0,0.15);
+#             transform: translateY(-1px);
+#         }
+        
+#         a{
+#             text-decoration: none;
+#             color: #0F403F !important;
+#         }
+#         a:hover{
+#             color: #0F403F !important;
+#             text-decoration: none;
+#         }
+        
+#         /* Chart Improvements */
+#         .marks{
+#             border-radius: 15px; /* Rounded corners for the SVG canvas */
+#             border: 1px solid  #0b8793; /* Greenish border */
+#             box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+#             margin-top: 20px; /* Add some spacing from the buttons */
+#             padding: 20px; /* Add padding inside the canvas */
+#             width: 99%; /* Full width */
+#             background-color: #f9fcfc;
+#         }
+        
+#         /* Make axes and labels more visible but sharper */
+#         .chart-wrapper {
+#             margin-bottom: 30px;
+#         }
+        
+#         .marks .axis-title, .marks .axis-label {
+#             font-weight: bold !important;
+#             font-size: 16px !important;
+#             fill: #333 !important;
+#         }
+        
+#         .marks .axis-domain, .marks .axis-tick {
+#             stroke: #333 !important;
+#             stroke-width: 2px !important;
+#         }
+        
+#         .marks .mark-line line {
+#             stroke-width: 3.5px !important;
+#         }
+        
+#         .marks .mark-point circle {
+#             stroke-width: 1.5px !important;
+#             fill-opacity: 1 !important;
+#         }
+        
+#         .marks .mark-rule line {
+#             stroke: #ddd !important;
+#             stroke-width: 1px !important;
+#         }
+        
+#         /* Numbers on axes */
+#         .marks text.role-axis-label {
+#             font-size: 16px !important;
+#             font-weight: bold !important;
+#             fill: #333 !important;
+#         }
+        
+#         /* Analysis text formatting */
+#         .scenario-analysis {
+#             background-color: #f9fcfc;
+#             border-left: 4px solid #0b8793;
+#             padding: 20px;
+#             margin-top: 20px;
+#             border-radius: 0 5px 5px 0;
+#             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+#         }
+        
+#         .scenario-analysis h3 {
+#             color: #0b8793;
+#             margin-bottom: 15px;
+#         }
+        
+#         .scenario-analysis ul {
+#             padding-left: 20px;
+#         }
+        
+#         .scenario-analysis li {
+#             margin-bottom: 8px;
+#             line-height: 1.5;
+#         }
+        
+#         /* Scenario header styling */
+#         h2 {
+#             color: #0b8793;
+#             border-bottom: 2px solid #73C8A9;
+#             padding-bottom: 8px;
+#             margin-top: 30px;
+#             margin-bottom: 20px;
+#         }
+        
+#         /* Clustering Section */
+#         .clustering-section {
+#             background-color: #f8f9fa;
+#             padding: 20px;
+#             border-radius: 10px;
+#             margin: 20px 0;
+#             border-left: 4px solid #0b8793;
+#             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+#         }
+        
+#         .cluster-chart {
+#             background-color: white;
+#             border-radius: 8px;
+#             padding: 15px;
+#             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+#             margin-top: 15px;
+#         }
+        
+#         .feature-selector {
+#             background-color: white;
+#             border-radius: 8px;
+#             padding: 15px;
+#             margin: 15px 0;
+#             border: 1px solid #e0e0e0;
+#         }
+        
+#         .cluster-insights {
+#             background-color: #f0f7fa;
+#             padding: 15px;
+#             border-radius: 8px;
+#             margin-top: 15px;
+#             border-left: 3px solid #0b8793;
+#         }
+        
+#         /* Style for the active navigation item */
+#         .nav-link-selected {
+#             background-color: transparent !important;
+#             position: relative !important;
+#             box-shadow: none !important;
+#         }
+        
+#         /* Navigation menu styling */
+#         .nav-link {
+#             transition: all 0.3s ease !important;
+#             border-radius: 0px !important;
+#         }
+        
+#         /* Hover effect for navigation links */
+#         .nav-link:hover {
+#             transform: translateY(-2px) !important;
+#         }
+        
+#         /* Hide default Streamlit elements */
+#         </style>
+#     """, unsafe_allow_html=True)
+
+#     # Add the toggle button at the top with a narrower column
+#     toggle_col1, toggle_col2 = st.columns([1, 11])
+#     with toggle_col1:
+#         st.button(st.session_state.button_text, key="toggle_sidebar_button", on_click=toggle_sidebar)
+
+#     # Streamlit UI
+#     st.sidebar.image("images/iesa_white.svg", width=200)
+#     st.sidebar.markdown("""<h2>IESA Scenario Analysis</h2>""", unsafe_allow_html=True)
+
+#     # Fetch available scenarios from DB
+#     scenarios_df = fetch_scenarios()
+#     scenario_categories = {category: list(group["scenario"]) for category, group in scenarios_df.groupby("category")}
+
+#     # Sidebar - Category Selection
+#     selected_category = st.sidebar.selectbox("Select Category", list(scenario_categories.keys()), key="category_select")
+
+#     # Query Dictionary for Analysis
+#     query_dict = {
+#         "Future Electricity Demand Growth": "SELECT Year, `Consumption (GWh)`, ((`Consumption (GWh)` - LAG(`Consumption (GWh)`, 1) OVER (ORDER BY Year)) / LAG(`Consumption (GWh)`, 1) OVER (ORDER BY Year) * 100) AS Growth_Rate FROM annual_electricity_data;",
+#         "Renewable Energy Contribution": "SELECT Year, `Renewable Electricity`, `Total`, (`Renewable Electricity` / `Total`) * 100 AS Renewable_Percentage FROM primary_energy_supplies_by_source_toe;",
+#         "Power Shortage Risk": "SELECT Year, `Generation (GWh)`, `Consumption (GWh)`, (`Generation (GWh)` - `Consumption (GWh)`) AS Surplus_Deficit FROM annual_electricity_data;",
+#         "Impact of Industrial Expansion on Electricity Demand": "SELECT Year, Industrial, (Industrial - LAG(Industrial, 1) OVER (ORDER BY Year)) / LAG(Industrial, 1) OVER (ORDER BY Year) * 100 AS Industrial_Growth_Rate FROM electricity_consumption_by_sector_gwh;",
+#         "Future Gas Demand Forecast": "SELECT Year, `Natural Gas Consumption`, ((`Natural Gas Consumption` - LAG(`Natural Gas Consumption`, 1) OVER (ORDER BY Year)) / LAG(`Natural Gas Consumption`, 1) OVER (ORDER BY Year)) * 100 AS Growth_Rate FROM natural_gas_production_and_consumption;",
+#         "Gas Production vs. Consumption Balance": "SELECT Year, `Natural Gas Production`, `Natural Gas Consumption`, (`Natural Gas Production` - `Natural Gas Consumption`) AS Surplus_Deficit FROM natural_gas_production_and_consumption;",
+#         "Total Energy Demand vs. Supply Balance": "SELECT YEAR, `Total Primary Energy Supply (MTOE)`, `Total Final Consumption of Energy (MTOE)`, (`Total Primary Energy Supply (MTOE)` - `Total Final Consumption of Energy (MTOE)`) AS Surplus_Deficit FROM energy_supply_and_consumption_analysis;",
+#         "Supply Chain Disruptions in Gas Imports": "SELECT Year, `Imports` FROM total_imports_lng;",
+#         "Sector-Wise Energy Consumption Changes": "SELECT Year, Total FROM sector_wise_energy_consumption;"
+#     }
+
+#     # Sidebar - Multi-Select Scenarios within Category
+#     selected_scenarios = st.sidebar.multiselect("Select Scenarios", scenario_categories[selected_category], key="scenarios_multiselect")
+
+#     # Add clustering option to sidebar
+#     st.sidebar.markdown("---")
+#     st.sidebar.markdown("### Data Clustering")
+#     st.sidebar.markdown("Discover patterns with K-means clustering")
+#     enable_clustering = st.sidebar.checkbox("Enable clustering analysis", key="enable_clustering")
+
+#     # Add clustering controls when enabled
+#     if enable_clustering and selected_scenarios:
+#         # Get all data for clustering
+#         all_data = {}
+#         numeric_columns = {}
+        
+#         for scenario in selected_scenarios:
+#             if scenario in query_dict:
+#                 query = query_dict[scenario]
+#                 data = fetch_data(query)
+                
+#                 if data is not None and not data.empty:
+#                     # Store data by scenario
+#                     all_data[scenario] = data
+                    
+#                     # Track numeric columns for each scenario (excluding Year)
+#                     numeric_cols = data.select_dtypes(include=['number']).columns.tolist()
+#                     if 'Year' in numeric_cols:
+#                         numeric_cols.remove('Year')
+#                     numeric_columns[scenario] = numeric_cols
+
+#         # Only show controls if we have data with numeric columns
+#         if numeric_columns:
+#             # Select scenario for clustering
+#             cluster_scenario = st.sidebar.selectbox(
+#                 "Select scenario for clustering",
+#                 options=list(numeric_columns.keys()),
+#                 key="cluster_scenario"
+#             )
+            
+#             # Select features for clustering
+#             if cluster_scenario and cluster_scenario in numeric_columns:
+#                 available_features = numeric_columns[cluster_scenario]
+                
+#                 selected_features = st.sidebar.multiselect(
+#                     "Select features for clustering",
+#                     options=available_features,
+#                     default=available_features[:min(2, len(available_features))],
+#                     key="clustering_features"
+#                 )
+                
+#                 # Number of clusters - using the session state value as default
+#                 num_clusters = st.sidebar.slider(
+#                     "Number of clusters",
+#                     min_value=2,
+#                     max_value=10,
+#                     value=st.session_state.num_clusters,
+#                     key="num_clusters"
+#                 )
+                
+#                 # Update only the selected_features in session state
+#                 # (not updating num_clusters since it's bound to widget)
+#                 st.session_state.selected_features = selected_features
+                
+#                 # Run clustering button
+#                 if st.sidebar.button("Run Clustering Analysis", key="run_clustering"):
+#                     if len(selected_features) > 0:
+#                         with st.spinner("Performing clustering analysis..."):
+#                             # Store the selected data for clustering
+#                             scenario_data = all_data[cluster_scenario]
+                            
+#                             # Run clustering using the current slider value
+#                             clustering_results = perform_kmeans_clustering(
+#                                 scenario_data, 
+#                                 selected_features, 
+#                                 num_clusters  # Using slider value directly
+#                             )
+                            
+#                             # Store results in session state
+#                             st.session_state.clustering_results = {
+#                                 'scenario': cluster_scenario,
+#                                 'results': clustering_results
+#                             }
+#                     else:
+#                         st.sidebar.error("Please select at least one feature for clustering")
+
+#     # Check if scenarios selection has changed and auto-hide sidebar if so
+#     if selected_scenarios and selected_scenarios != st.session_state.previous_scenarios:
+#         st.session_state.current_action = "new_selection"  # Mark that selection changed
+#         auto_hide_sidebar()
+#         st.session_state.previous_scenarios = selected_scenarios.copy()
+
+#     # Function to create chart with fixed dimensions
+#     def create_chart(data, scenario, y_col):
+#         # Fixed dimensions for consistency
+#         fixed_width = 550  # Increased fixed width
+#         fixed_height = 350  # Increased fixed height
+        
+#         # Create a more visible color scheme
+#         color_scheme = alt.Scale(range=['#0b67a0', '#d62728', '#2ca02c', '#9467bd', '#8c564b'])
+        
+#         # Create a base chart with fixed dimensions
+#         base = alt.Chart(data).encode(
+#             x=alt.X("Year:O", title="Year", axis=alt.Axis(
+#                 labelAngle=0,
+#                 titleFontSize=16,
+#                 titleFontWeight='bold',
+#                 labelFontSize=14,
+#                 labelFontWeight='bold',
+#                 tickWidth=2,
+#                 tickColor='#333333',
+#                 labelColor='#333333',
+#                 titleColor='#333333',
+#                 domainColor='#666666',
+#                 domainWidth=2
+#             )),
+#             y=alt.Y(y_col, title=y_col, axis=alt.Axis(
+#                 titleFontSize=16,
+#                 titleFontWeight='bold',
+#                 labelFontSize=14,
+#                 labelFontWeight='bold',
+#                 grid=True,
+#                 gridColor='#e0e0e0',
+#                 tickWidth=2,
+#                 tickColor='#333333',
+#                 labelColor='#333333',
+#                 titleColor='#333333',
+#                 domainColor='#666666',
+#                 domainWidth=2,
+#                 format=',.0f'  # Format numbers without decimals
+#             ))
+#         ).properties(
+#             title={
+#                 "text": f"{scenario}: Year vs {y_col}",
+#                 "fontSize": 18,
+#                 "fontWeight": "bold",
+#                 "color": "#0b8793"
+#             },
+#             width=fixed_width,
+#             height=fixed_height
+#         )
+        
+#         # Add line layer
+#         line = base.mark_line(
+#             strokeWidth=3.5,
+#             clip=True,
+#             color='#0066cc'
+#         ).encode(
+#             tooltip=list(data.columns)
+#         )
+        
+#         # Add points with enhanced visibility
+#         points = base.mark_circle(
+#             size=80,
+#             opacity=1,
+#             stroke='#fff',
+#             strokeWidth=1.5,
+#             color='#0066cc'
+#         ).encode(
+#             tooltip=list(data.columns)
+#         )
+        
+#         # Combine layers
+#         final_chart = alt.layer(line, points).configure_view(
+#             strokeWidth=1,
+#             stroke='#ddd'
+#         ).configure_axis(
+#             domainWidth=2,
+#             domainColor='#666666',
+#             labelFontWeight='bold',
+#             labelColor='#333333',
+#             titleColor='#333333',
+#             tickColor='#666666'
+#         ).configure_title(
+#             fontSize=18,
+#             font='Arial',
+#             fontWeight='bold',
+#             anchor='start',
+#             color='#0b8793'
+#         )
+        
+#         return final_chart
+
+#     # Loop through selected scenarios
+#     for scenario in selected_scenarios:
+#         st.markdown(f"## Scenario: {scenario}")
+
+#         # Fetch data
+#         if scenario in query_dict:
+#             query = query_dict[scenario]
+#             data = fetch_data(query)
+            
+#             if data is not None and not data.empty:
+#                 # Dynamic Charts (Two-column layout)
+#                 num_cols = 2
+#                 cols = st.columns(num_cols)
+#                 y_columns = list(data.columns[1:])  # Exclude 'Year' column
+
+#                 for idx, y_col in enumerate(y_columns):
+#                     col_idx = idx % num_cols
+#                     chart_key = f"{scenario}_{y_col}"
+                    
+#                     # Add to tracking of currently displayed charts
+#                     st.session_state.chart_keys.add(chart_key)
+                    
+#                     with cols[col_idx]:
+#                         # Create a fixed sized container to ensure consistency
+#                         container = st.container()
+                        
+#                         # Only create new chart when needed (selection changed, first load, or analysis)
+#                         if (chart_key not in st.session_state.rendered_charts or 
+#                             st.session_state.current_action in ["new_selection", "analysis", None]):
+#                             final_chart = create_chart(data, scenario, y_col)
+#                             st.session_state.rendered_charts[chart_key] = final_chart
+#                         else:
+#                             final_chart = st.session_state.rendered_charts[chart_key]
+                        
+#                         # Use precise dimensions for chart display
+#                         with container:
+#                             st.altair_chart(final_chart, use_container_width=False)
+#             else:
+#                 st.error(f"No data available for scenario: {scenario}")
+
+#         # AI Analysis Button for Each Scenario with auto-hide on click
+#         if st.sidebar.button(f"Analyze {scenario}", on_click=auto_hide_sidebar_no_rerun, key=f"analyze_{scenario}"):
+#             st.session_state.current_action = "analysis"  # Mark that we're running analysis
+#             with st.spinner(f"Analyzing {scenario}... This may take a moments"):
+#                 analysis_tool = ScenarioAnalysisTool()
+#                 data_string = data.to_string(index=False)
+#                 analysis = analysis_tool.forward(scenario, data_string)
+#                 # Store analysis in session state
+#                 st.session_state.scenario_analyses[scenario] = analysis
+            
+#         # Display saved analyses for this scenario
+#         if scenario in st.session_state.scenario_analyses:
+#             st.subheader(f"Analysis for {scenario}")
+#             # Wrap the analysis in a styled div
+#             st.markdown(f'<div class="scenario-analysis">{st.session_state.scenario_analyses[scenario]}</div>', unsafe_allow_html=True)
+
+#     # Display clustering results if available
+#     if enable_clustering and 'clustering_results' in st.session_state and st.session_state.clustering_results:
+#         st.markdown("---")
+#         st.markdown("## Cluster Analysis")
+        
+#         # Get clustering results from session state
+#         cluster_data = st.session_state.clustering_results
+#         scenario = cluster_data['scenario']
+#         results = cluster_data['results']
+#         features = results['features']
+        
+#         # Create a styled container for the clustering section
+#         st.markdown('<div class="clustering-section">', unsafe_allow_html=True)
+        
+#         # Display information about the clustering
+#         st.subheader(f"K-means Clustering for '{scenario}'")
+#         st.markdown(f"""
+#         <div class="cluster-insights">
+#             <h4>Clustering Information:</h4>
+#             <ul>
+#                 <li><strong>Number of clusters:</strong> {st.session_state.num_clusters}</li>
+#                 <li><strong>Features used:</strong> {", ".join(features)}</li>
+#                 <li><strong>Clustering metric (inertia):</strong> {results['inertia']:.2f}</li>
+#             </ul>
+#         </div>
+#         """, unsafe_allow_html=True)
+        
+#         # Display the cluster chart
+#         st.markdown('<div class="cluster-chart">', unsafe_allow_html=True)
+#         cluster_chart = create_cluster_chart(results, features)
+#         st.altair_chart(cluster_chart, use_container_width=True)
+#         st.markdown('</div>', unsafe_allow_html=True)
+        
+#         # Display cluster statistics
+#         st.subheader("Cluster Statistics")
+        
+#         # Get the clustered data
+#         clustered_df = results['data'].dropna(subset=['Cluster'])
+        
+#         # Calculate statistics per cluster
+#         cluster_stats = clustered_df.groupby('Cluster')[features].agg(['mean', 'min', 'max', 'std']).round(2)
+#         st.dataframe(cluster_stats, use_container_width=True)
+        
+#         # Show a sample of data points from each cluster
+#         st.subheader("Samples from Each Cluster")
+        
+#         # Create tabs for each cluster
+#         tabs = st.tabs([f"Cluster {i}" for i in range(st.session_state.num_clusters)])
+#         for i, tab in enumerate(tabs):
+#             with tab:
+#                 cluster_samples = clustered_df[clustered_df['Cluster'] == i].reset_index(drop=True)
+#                 if not cluster_samples.empty:
+#                     st.dataframe(cluster_samples[['Year'] + features], use_container_width=True)
+#                 else:
+#                     st.info(f"No data points in Cluster {i}")
+        
+#         st.markdown('</div>', unsafe_allow_html=True)
+
+#     # Check if we should rerun the app at the end
+#     if st.session_state.should_rerun:
+#         st.session_state.should_rerun = False
+#         # Reset current action after rerun
+#         st.session_state.current_action = None
+#         st.rerun()
+
+
+import requests
 import streamlit as st
 import pandas as pd
-import mysql.connector
 import groq
 import altair as alt
 from streamlit_option_menu import option_menu
@@ -11,260 +910,407 @@ import numpy as np
 from sklearn.decomposition import PCA
 import os
 
+
+# ── Supabase REST API config ───────────────────────────────────────────────────
+def get_supabase_creds():
+    """Read Supabase credentials from Streamlit secrets."""
+    url = st.secrets["db_url"].rstrip("/")
+    api_key = st.secrets["db_api_key"]
+    return url, api_key
+
+
+def _supabase_headers(api_key: str) -> dict:
+    """Return standard Supabase REST headers."""
+    return {
+        "apikey": api_key,
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "Prefer": "count=none",
+    }
+
+
+def fetch_table_data_rest(table_name: str) -> pd.DataFrame:
+    """Fetch all rows from a Supabase table via PostgREST."""
+    try:
+        supabase_url, api_key = get_supabase_creds()
+        url = f"{supabase_url}/rest/v1/{table_name}"
+        headers = {
+            **_supabase_headers(api_key),
+            "Range-Unit": "items",
+            "Range": "0-",
+        }
+        resp = requests.get(url, headers=headers, params={"select": "*"}, timeout=20)
+        resp.raise_for_status()
+        rows = resp.json()
+        if not rows:
+            return pd.DataFrame()
+        data = pd.DataFrame(rows)
+        # Convert numeric columns to float
+        for col in data.columns[1:]:
+            data[col] = pd.to_numeric(data[col], errors="coerce")
+        data.fillna(0, inplace=True)
+        return data
+    except Exception as e:
+        st.error(f"Error fetching '{table_name}': {e}")
+        return pd.DataFrame()
+
+
+def fetch_query_rest(table_name: str, select_cols: str = "*", order_col: str = None) -> pd.DataFrame:
+    """
+    Fetch data from a Supabase table with optional column selection and ordering.
+    Used to replicate the custom SQL queries from the original code.
+    """
+    try:
+        supabase_url, api_key = get_supabase_creds()
+        url = f"{supabase_url}/rest/v1/{table_name}"
+        headers = {
+            **_supabase_headers(api_key),
+            "Range-Unit": "items",
+            "Range": "0-",
+        }
+        params = {"select": select_cols}
+        if order_col:
+            params["order"] = order_col
+        resp = requests.get(url, headers=headers, params=params, timeout=20)
+        resp.raise_for_status()
+        rows = resp.json()
+        if not rows:
+            return pd.DataFrame()
+        return pd.DataFrame(rows)
+    except Exception as e:
+        st.error(f"Error fetching data: {e}")
+        return pd.DataFrame()
+
+
 def load_scenerio_analysis(logger):
 
-    # Initialize sidebar state
-    if 'sidebar_state' not in st.session_state:
-        st.session_state.sidebar_state = 'expanded'
-    if 'button_text' not in st.session_state:
-        st.session_state.button_text = '← Hide'
-    if 'previous_scenarios' not in st.session_state:
-        st.session_state.previous_scenarios = []
-    if 'should_rerun' not in st.session_state:
-        st.session_state.should_rerun = False
-    if 'scenario_analyses' not in st.session_state:
-        st.session_state.scenario_analyses = {}
-    if 'toggle_triggered' not in st.session_state:
-        st.session_state.toggle_triggered = False
-    if 'rendered_charts' not in st.session_state:
-        st.session_state.rendered_charts = {}
-    if 'chart_keys' not in st.session_state:
-        st.session_state.chart_keys = set()
-    if 'current_action' not in st.session_state:
-        st.session_state.current_action = None
-    # New clustering state variables
-    if 'clustering_results' not in st.session_state:
-        st.session_state.clustering_results = {}
-    if 'selected_features' not in st.session_state:
-        st.session_state.selected_features = []
-    if 'num_clusters' not in st.session_state:
-        st.session_state.num_clusters = 3
-        
-    # Function to toggle sidebar
+    # ── Sidebar state: apply BEFORE any other st calls ────────────────────────
+    # This is the key fix: st.set_page_config must be called at the top level,
+    # but we can control the sidebar collapsed/expanded state via JS injection.
+
+    # Initialize session state
+    defaults = {
+        "sidebar_state":      "expanded",
+        "button_text":        "← Hide",
+        "previous_scenarios": [],
+        "should_rerun":       False,
+        "scenario_analyses":  {},
+        "toggle_triggered":   False,
+        "rendered_charts":    {},
+        "chart_keys":         set(),
+        "current_action":     None,
+        "clustering_results": {},
+        "selected_features":  [],
+        "num_clusters":       3,
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+
+    # ── Inject JS to actually collapse/expand the sidebar ─────────────────────
+    # Streamlit doesn't expose a Python API to toggle the sidebar at runtime,
+    # so we use JS to click the collapse/expand button when the state changes.
+    if st.session_state.sidebar_state == "collapsed":
+        st.markdown(
+            """
+            <script>
+            (function() {
+                const btn = window.parent.document.querySelector(
+                    '[data-testid="collapsedControl"]'
+                );
+                if (btn) btn.click();
+            })();
+            </script>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # ── Sidebar toggle helpers ─────────────────────────────────────────────────
     def toggle_sidebar():
-        if st.session_state.sidebar_state == 'expanded':
-            st.session_state.sidebar_state = 'collapsed'
-            st.session_state.button_text = '→ Show'
+        if st.session_state.sidebar_state == "expanded":
+            st.session_state.sidebar_state = "collapsed"
+            st.session_state.button_text = "→ Show"
         else:
-            st.session_state.sidebar_state = 'expanded'
-            st.session_state.button_text = '← Hide'
+            st.session_state.sidebar_state = "expanded"
+            st.session_state.button_text = "← Hide"
         st.session_state.should_rerun = True
         st.session_state.toggle_triggered = True
 
-    # Function to auto-hide sidebar
     def auto_hide_sidebar():
-        st.session_state.sidebar_state = 'collapsed'
-        st.session_state.button_text = '→ Show'
+        st.session_state.sidebar_state = "collapsed"
+        st.session_state.button_text = "→ Show"
         st.session_state.should_rerun = True
         st.session_state.toggle_triggered = False
 
-    # Function to auto-hide sidebar without rerunning
     def auto_hide_sidebar_no_rerun():
-        st.session_state.sidebar_state = 'collapsed'
-        st.session_state.button_text = '→ Show'
+        st.session_state.sidebar_state = "collapsed"
+        st.session_state.button_text = "→ Show"
         st.session_state.toggle_triggered = False
 
-
-    # Database connection
-    def get_connection():
-        return mysql.connector.connect(
-            host="localhost",
-            port="3306",
-            user="root",
-            passwd="admin123",
-            db="iesa_db"
+    # ── Database helpers (Supabase PostgREST) ─────────────────────────────────
+    def fetch_scenarios() -> pd.DataFrame:
+        """Fetch scenario_definitions table: category + scenario columns."""
+        return fetch_query_rest(
+            "scenario_definitions",
+            select_cols="category,scenario",
+            order_col="category",
         )
 
-    # Fetch Scenarios from Database
-    def fetch_scenarios():
-        conn = get_connection()
-        query = "SELECT category, scenario FROM scenario_definitions;"
-        df = pd.read_sql(query, conn)
-        conn.close()
+    def fetch_data(scenario_key: str) -> pd.DataFrame:
+        """
+        Return data for a given scenario key.
+
+        The original code used raw SQL with window functions (LAG / OVER).
+        PostgREST does not support arbitrary SQL, so we fetch the base table
+        and compute derived columns (growth rates, surplus/deficit) in Python.
+        """
+        table_map = {
+            "Future Electricity Demand Growth":
+                "annual_electricity_data",
+            "Renewable Energy Contribution":
+                "primary_energy_supplies_by_source_toe",
+            "Power Shortage Risk":
+                "annual_electricity_data",
+            "Impact of Industrial Expansion on Electricity Demand":
+                "electricity_consumption_by_sector_gwh",
+            "Future Gas Demand Forecast":
+                "natural_gas_production_and_consumption",
+            "Gas Production vs. Consumption Balance":
+                "natural_gas_production_and_consumption",
+            "Total Energy Demand vs. Supply Balance":
+                "energy_supply_and_consumption_analysis",
+            "Supply Chain Disruptions in Gas Imports":
+                "total_imports_lng",
+            "Sector-Wise Energy Consumption Changes":
+                "sector_wise_energy_consumption",
+        }
+
+        col_map = {
+            # scenario_key: list of columns to SELECT (first must be Year)
+            "Future Electricity Demand Growth":
+                ["Year", "Consumption (GWh)"],
+            "Renewable Energy Contribution":
+                ["Year", "Renewable Electricity", "Total"],
+            "Power Shortage Risk":
+                ["Year", "Generation (GWh)", "Consumption (GWh)"],
+            "Impact of Industrial Expansion on Electricity Demand":
+                ["Year", "Industrial"],
+            "Future Gas Demand Forecast":
+                ["Year", "Natural Gas Consumption"],
+            "Gas Production vs. Consumption Balance":
+                ["Year", "Natural Gas Production", "Natural Gas Consumption"],
+            "Total Energy Demand vs. Supply Balance":
+                ["Year",
+                 "Total Primary Energy Supply (MTOE)",
+                 "Total Final Consumption of Energy (MTOE)"],
+            "Supply Chain Disruptions in Gas Imports":
+                ["Year", "Imports"],
+            "Sector-Wise Energy Consumption Changes":
+                ["Year", "Total"],
+        }
+
+        if scenario_key not in table_map:
+            return pd.DataFrame()
+
+        table  = table_map[scenario_key]
+        cols   = col_map.get(scenario_key, ["*"])
+
+        # URL-encode column names that contain spaces/parentheses
+        select_str = ",".join(
+            f'"{c}"' if any(ch in c for ch in " ()") else c
+            for c in cols
+        )
+
+        df = fetch_query_rest(table, select_cols=select_str, order_col="Year")
+        if df.empty:
+            return df
+
+        # Convert numeric cols
+        for c in cols[1:]:
+            if c in df.columns:
+                df[c] = pd.to_numeric(df[c], errors="coerce")
+
+        # ── Compute derived columns in Python ─────────────────────────────────
+        if scenario_key == "Future Electricity Demand Growth":
+            df["Growth_Rate"] = (
+                df["Consumption (GWh)"].pct_change() * 100
+            ).round(4)
+
+        elif scenario_key == "Renewable Energy Contribution":
+            df["Renewable_Percentage"] = (
+                df["Renewable Electricity"] / df["Total"] * 100
+            ).round(4)
+
+        elif scenario_key == "Power Shortage Risk":
+            df["Surplus_Deficit"] = (
+                df["Generation (GWh)"] - df["Consumption (GWh)"]
+            )
+
+        elif scenario_key == "Impact of Industrial Expansion on Electricity Demand":
+            df["Industrial_Growth_Rate"] = (
+                df["Industrial"].pct_change() * 100
+            ).round(4)
+
+        elif scenario_key == "Future Gas Demand Forecast":
+            df["Growth_Rate"] = (
+                df["Natural Gas Consumption"].pct_change() * 100
+            ).round(4)
+
+        elif scenario_key == "Gas Production vs. Consumption Balance":
+            df["Surplus_Deficit"] = (
+                df["Natural Gas Production"] - df["Natural Gas Consumption"]
+            )
+
+        elif scenario_key == "Total Energy Demand vs. Supply Balance":
+            df["Surplus_Deficit"] = (
+                df["Total Primary Energy Supply (MTOE)"]
+                - df["Total Final Consumption of Energy (MTOE)"]
+            )
+
         return df
 
-    # Fetch predefined query results
-    def fetch_data(query):
-        conn = get_connection()
-        df = pd.read_sql(query, conn)
-        conn.close()
-        return df
-    api_keys=None
+    # ── K-means clustering ─────────────────────────────────────────────────────
+    def perform_kmeans_clustering(data, features, n_clusters=3):
+        X = data[features].dropna()
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+        cluster_labels = kmeans.fit_predict(X_scaled)
+
+        clustered_data = data.copy()
+        clustered_data.loc[X.index, "Cluster"] = cluster_labels
+
+        if len(features) > 2:
+            pca = PCA(n_components=2)
+            pca_result = pca.fit_transform(X_scaled)
+            pca_centers = pca.transform(scaler.transform(kmeans.cluster_centers_))
+            pca_df = pd.DataFrame(pca_result, columns=["PC1", "PC2"])
+            pca_df["Cluster"] = cluster_labels
+            pca_df["Year"] = X.index.map(lambda idx: data.loc[idx, "Year"])
+            explained_variance = pca.explained_variance_ratio_
+        else:
+            pca_df = None
+            pca_centers = None
+            explained_variance = None
+
+        return {
+            "data":             clustered_data,
+            "centers":          kmeans.cluster_centers_,
+            "inertia":          kmeans.inertia_,
+            "pca_data":         pca_df,
+            "pca_centers":      pca_centers,
+            "explained_variance": explained_variance,
+            "features":         features,
+            "scaler":           scaler,
+        }
+
+    def create_cluster_chart(cluster_results, original_features):
+        if len(original_features) <= 2:
+            plot_df = cluster_results["data"].dropna(subset=["Cluster"])
+            x_col = original_features[0]
+            y_col = original_features[1] if len(original_features) > 1 else original_features[0]
+            return (
+                alt.Chart(plot_df)
+                .mark_circle(size=80)
+                .encode(
+                    x=alt.X(f"{x_col}:Q", title=x_col),
+                    y=alt.Y(f"{y_col}:Q", title=y_col),
+                    color=alt.Color(
+                        "Cluster:N",
+                        scale=alt.Scale(scheme="category10"),
+                        legend=alt.Legend(title="Cluster"),
+                    ),
+                    tooltip=["Year", x_col, y_col, "Cluster"],
+                )
+                .properties(
+                    width=600,
+                    height=400,
+                    title=f'Clusters based on {", ".join(original_features)}',
+                )
+            )
+        else:
+            pca_df = cluster_results["pca_data"]
+            ev = cluster_results["explained_variance"]
+            title = (
+                f"Clusters based on {len(original_features)} features "
+                f"(PCA: {ev[0]:.1%}, {ev[1]:.1%} variance explained)"
+            )
+            return (
+                alt.Chart(pca_df)
+                .mark_circle(size=80)
+                .encode(
+                    x=alt.X("PC1:Q", title="Principal Component 1"),
+                    y=alt.Y("PC2:Q", title="Principal Component 2"),
+                    color=alt.Color(
+                        "Cluster:N",
+                        scale=alt.Scale(scheme="category10"),
+                        legend=alt.Legend(title="Cluster"),
+                    ),
+                    tooltip=["Year", "PC1", "PC2", "Cluster"],
+                )
+                .properties(width=600, height=400, title=title)
+            )
+
+    # ── AI client ─────────────────────────────────────────────────────────────
+    api_keys = None
     try:
         api_keys = st.secrets.get("api_keys")
     except Exception:
         api_keys = None
-    # AI-powered Scenario Analysis
+
     client = groq.Client(api_keys)
 
     class ScenarioAnalysisTool(Tool):
         name = "scenario_analysis"
         description = "Analyzes a generated scenario and provides structured insights."
         inputs = {
-            "scenario": {"type": "string", "description": "Scenario title."},
-            "data_string": {"type": "string", "description": "String representation of the dataset."}
+            "scenario":    {"type": "string", "description": "Scenario title."},
+            "data_string": {"type": "string", "description": "String representation of the dataset."},
         }
         output_type = "string"
 
         def forward(self, scenario: str, data_string: str):
-            prompt = (f"Analyze the following dataset based on actual trends:\n\n"
-                    f"{data_string}\n\n"
-                    f"Scenario: {scenario}\n\n"
-                    "Provide a concise yet informative analysis with 2-3 main sections. Each section should have a clear heading and 2-3 bullet points with specific insights. Focus exclusively on the data provided.\n\n"
-                    "Format your response as follows:\n\n"
-                    "## Key Trend Analysis\n"
-                    "- Include specific numbers and percentages from the data\n"
-                    "- Highlight the most significant pattern observed\n\n"
-                    "## Impact Assessment\n"
-                    "- Describe direct implications based on the data\n"
-                    "- Use comparative analysis when relevant\n\n"
-                    "Keep each bullet point concise but informative with data-backed observations.")
-
+            prompt = (
+                f"Analyze the following dataset based on actual trends:\n\n"
+                f"{data_string}\n\n"
+                f"Scenario: {scenario}\n\n"
+                "Provide a concise yet informative analysis with 2-3 main sections. "
+                "Each section should have a clear heading and 2-3 bullet points with specific insights. "
+                "Focus exclusively on the data provided.\n\n"
+                "Format your response as follows:\n\n"
+                "## Key Trend Analysis\n"
+                "- Include specific numbers and percentages from the data\n"
+                "- Highlight the most significant pattern observed\n\n"
+                "## Impact Assessment\n"
+                "- Describe direct implications based on the data\n"
+                "- Use comparative analysis when relevant\n\n"
+                "Keep each bullet point concise but informative with data-backed observations."
+            )
             response = client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": prompt}]
+                messages=[{"role": "user", "content": prompt}],
             )
-            
             return response.choices[0].message.content.strip()
 
-    # Function to perform K-means clustering
-    def perform_kmeans_clustering(data, features, n_clusters=3):
-        """
-        Perform K-means clustering on selected features
-        
-        Args:
-            data: DataFrame containing the data
-            features: List of column names to use for clustering
-            n_clusters: Number of clusters to form
-        
-        Returns:
-            Dictionary containing:
-            - 'data': Original data with cluster assignments
-            - 'centers': Cluster centers
-            - 'inertia': Sum of squared distances of samples to their closest cluster center
-            - 'pca_data': PCA-transformed data for visualization (if >2 dimensions)
-            - 'pca_centers': PCA-transformed cluster centers (if >2 dimensions)
-        """
-        # Select only numeric features and drop rows with missing values
-        X = data[features].dropna()
-        
-        # Store index mapping between X and original data
-        index_mapping = {i: idx for i, idx in enumerate(X.index)}
-        
-        # Standardize the features
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
-        
-        # Apply K-means clustering
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
-        cluster_labels = kmeans.fit_predict(X_scaled)
-        
-        # Add cluster labels to the data
-        clustered_data = data.copy()
-        clustered_data.loc[X.index, 'Cluster'] = cluster_labels
-        
-        # For visualization, apply PCA if more than 2 features
-        if len(features) > 2:
-            pca = PCA(n_components=2)
-            pca_result = pca.fit_transform(X_scaled)
-            pca_centers = pca.transform(scaler.transform(kmeans.cluster_centers_))
-            
-            # Create DataFrame for PCA results
-            pca_df = pd.DataFrame(
-                data=pca_result,
-                columns=['PC1', 'PC2']
-            )
-            pca_df['Cluster'] = cluster_labels
-            pca_df['Year'] = X.index.map(lambda idx: data.loc[idx, 'Year'])
-            
-            explained_variance = pca.explained_variance_ratio_
-        else:
-            pca_df = None
-            pca_centers = None
-            explained_variance = None
-        
-        return {
-            'data': clustered_data,
-            'centers': kmeans.cluster_centers_,
-            'inertia': kmeans.inertia_,
-            'pca_data': pca_df,
-            'pca_centers': pca_centers,
-            'explained_variance': explained_variance,
-            'features': features,
-            'scaler': scaler
-        }
-
-    # Function to create cluster visualization
-    def create_cluster_chart(cluster_results, original_features):
-        """Create Altair visualization for clusters"""
-        if len(original_features) <= 2:
-            # Direct visualization using original features
-            plot_df = cluster_results['data'].dropna(subset=['Cluster'])
-            x_col = original_features[0]
-            y_col = original_features[1] if len(original_features) > 1 else original_features[0]
-            
-            # Create the scatter plot
-            scatter = alt.Chart(plot_df).mark_circle(size=80).encode(
-                x=alt.X(f'{x_col}:Q', title=x_col),
-                y=alt.Y(f'{y_col}:Q', title=y_col),
-                color=alt.Color('Cluster:N', scale=alt.Scale(scheme='category10'),
-                            legend=alt.Legend(title="Cluster")),
-                tooltip=['Year', x_col, y_col, 'Cluster']
-            ).properties(
-                width=600,
-                height=400,
-                title=f'Clusters based on {", ".join(original_features)}'
-            )
-            
-            return scatter
-
-        else:
-            # Use PCA results for visualization
-            pca_df = cluster_results['pca_data']
-            
-            # Add a title with explained variance
-            ev = cluster_results['explained_variance']
-            title = f'Clusters based on {len(original_features)} features (PCA: {ev[0]:.1%}, {ev[1]:.1%} variance explained)'
-            
-            # Create scatter plot with PCA components
-            scatter = alt.Chart(pca_df).mark_circle(size=80).encode(
-                x=alt.X('PC1:Q', title='Principal Component 1'),
-                y=alt.Y('PC2:Q', title='Principal Component 2'),
-                color=alt.Color('Cluster:N', scale=alt.Scale(scheme='category10'),
-                            legend=alt.Legend(title="Cluster")),
-                tooltip=['Year', 'PC1', 'PC2', 'Cluster']
-            ).properties(
-                width=600,
-                height=400,
-                title=title
-            )
-            
-            return scatter
-
-    # CSS and JavaScript for dynamic button states
+    # ── CSS ────────────────────────────────────────────────────────────────────
     st.markdown("""
         <style>
-        /* General Styling */
         header {
-            border-bottom: 3px solid  #136a8a !important; 
+            border-bottom: 3px solid #136a8a !important;
             margin-bottom: 0 !important;
             position: relative !important;
             z-index: 99 !important;
             height: 2.5rem !important;
         }
         [data-testid="stSidebar"] {
-            background: linear-gradient(135deg, #73C8A9, #0b8793); /* Gradient background */
+            background: linear-gradient(135deg, #73C8A9, #0b8793);
             color: white;
-            margin-top:-10px;
+            margin-top: -10px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             z-index: 98;
         }
-        .sidebar-content {
-            margin-top: -60px;
-            padding: 20px;
-        }
-        
-        /* Navigation bar styling - remove borders except bottom */
+        .sidebar-content { margin-top: -60px; padding: 20px; }
         [data-baseweb="tab-list"] {
             border-top: none !important;
             border-left: none !important;
@@ -272,21 +1318,9 @@ def load_scenerio_analysis(logger):
             border-bottom: 2px solid #e0e5eb !important;
             background-color: transparent !important;
         }
-        
-        /* Remove any backgrounds */
-        .stTabs {
+        .stTabs, .stTabs [data-baseweb="tab-list"], .stTabs [data-baseweb="tab"] {
             background-color: transparent !important;
         }
-        
-        .stTabs [data-baseweb="tab-list"] {
-            background-color: transparent !important;
-        }
-        
-        .stTabs [data-baseweb="tab"] {
-            background-color: transparent !important;
-        }
-        
-        /* Add bottom bar to active navigation item */
         .nav-link-selected::after {
             content: '' !important;
             position: absolute !important;
@@ -294,41 +1328,24 @@ def load_scenerio_analysis(logger):
             left: 10% !important;
             width: 80% !important;
             height: 4px !important;
-            background-color: #73c8a9 !important; 
+            background-color: #73c8a9 !important;
             border-radius: 2px !important;
             transition: all 0.3s ease !important;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
         }
-        
-        /* Make the active tab text color the original color */
         .nav-link-selected {
-            color: #106466 !important; 
+            color: #106466 !important;
             font-weight: bold !important;
+            background-color: transparent !important;
+            position: relative !important;
+            box-shadow: none !important;
         }
-        
-        /* Remove grey background from navigation container */
         section[data-testid="stSectionContainer"] div[data-testid="stVerticalBlock"] {
             background-color: transparent !important;
         }
-        
-        /* Remove extra spacing at the top */
-        .block-container {
-            padding-top: 0.1rem !important;
-        }
-        
-        /* Main wrapper for streamlit app */
-        .main .block-container {
-            padding-top: 0.5rem !important;
-            margin-top: 0 !important;
-        }
-        
-        /* Fix for option menu container positioning */
-        section[data-testid="stSectionContainer"] {
-            position: relative;
-            z-index: 100;
-        }
-        
-        /* Toggle button styles */
+        .block-container { padding-top: 0.1rem !important; }
+        .main .block-container { padding-top: 0.5rem !important; margin-top: 0 !important; }
+        section[data-testid="stSectionContainer"] { position: relative; z-index: 100; }
         div[data-testid="stHorizontalBlock"] > div:first-child button {
             background-color: #0b8793;
             color: white !important;
@@ -339,13 +1356,11 @@ def load_scenerio_analysis(logger):
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
         }
-
         div[data-testid="stHorizontalBlock"] > div:first-child button:hover {
             background-color: #4AC29A;
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        
         [data-testid="stSidebar"] h2 {
             font-size: 22px !important;
             margin-top: 25px !important;
@@ -354,49 +1369,30 @@ def load_scenerio_analysis(logger):
             border-bottom: 2px solid rgba(255,255,255,0.3);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
-        
         [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
             color: rgba(255,255,255,0.9) !important;
             font-weight: 500;
             margin-bottom: 8px;
             font-size: 15px;
         }
-        
-        [data-testid="stSidebar"] .stSelectbox > div, [data-testid="stSidebar"] .stMultiSelect > div {
+        [data-testid="stSidebar"] .stSelectbox > div,
+        [data-testid="stSidebar"] .stMultiSelect > div {
             background-color: rgba(255,255,255,0.1) !important;
             border: 1px solid rgba(255,255,255,0.2) !important;
             border-radius: 5px;
             color: white !important;
             margin-bottom: 15px;
         }
-        
-        [data-testid="stSidebar"] .stSelectbox > div:hover, [data-testid="stSidebar"] .stMultiSelect > div:hover {
+        [data-testid="stSidebar"] .stSelectbox > div:hover,
+        [data-testid="stSidebar"] .stMultiSelect > div:hover {
             border: 1px solid rgba(255,255,255,0.4) !important;
         }
-        
         [data-testid="stSidebar"] span[data-baseweb="tag"] {
             background-color: #73C8A9 !important;
             border: none !important;
         }
-        
-        .logo-title-container {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .logo img {
-            width: 60px;
-            border-radius: 50%;
-        }
-        .app-name {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-    
-    
         .stButton button {
-            width:100%;
+            width: 100%;
             background-color: #0b8793;
             color: white !important;
             border: 1px solid #4AC29A;
@@ -410,72 +1406,47 @@ def load_scenerio_analysis(logger):
             letter-spacing: 0.3px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-
         .stButton button:hover {
             background-color: #4AC29A;
             color: white !important;
             box-shadow: 0 3px 7px rgba(0,0,0,0.15);
             transform: translateY(-1px);
         }
-        
-        a{
-            text-decoration: none;
-            color: #0F403F !important;
-        }
-        a:hover{
-            color: #0F403F !important;
-            text-decoration: none;
-        }
-        
-        /* Chart Improvements */
-        .marks{
-            border-radius: 15px; /* Rounded corners for the SVG canvas */
-            border: 1px solid  #0b8793; /* Greenish border */
-            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
-            margin-top: 20px; /* Add some spacing from the buttons */
-            padding: 20px; /* Add padding inside the canvas */
-            width: 99%; /* Full width */
+        a { text-decoration: none; color: #0F403F !important; }
+        a:hover { color: #0F403F !important; text-decoration: none; }
+        .marks {
+            border-radius: 15px;
+            border: 1px solid #0b8793;
+            box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
+            margin-top: 20px;
+            padding: 20px;
+            width: 99%;
             background-color: #f9fcfc;
         }
-        
-        /* Make axes and labels more visible but sharper */
-        .chart-wrapper {
-            margin-bottom: 30px;
-        }
-        
+        .chart-wrapper { margin-bottom: 30px; }
         .marks .axis-title, .marks .axis-label {
             font-weight: bold !important;
             font-size: 16px !important;
             fill: #333 !important;
         }
-        
         .marks .axis-domain, .marks .axis-tick {
             stroke: #333 !important;
             stroke-width: 2px !important;
         }
-        
-        .marks .mark-line line {
-            stroke-width: 3.5px !important;
-        }
-        
+        .marks .mark-line line { stroke-width: 3.5px !important; }
         .marks .mark-point circle {
             stroke-width: 1.5px !important;
             fill-opacity: 1 !important;
         }
-        
         .marks .mark-rule line {
             stroke: #ddd !important;
             stroke-width: 1px !important;
         }
-        
-        /* Numbers on axes */
         .marks text.role-axis-label {
             font-size: 16px !important;
             font-weight: bold !important;
             fill: #333 !important;
         }
-        
-        /* Analysis text formatting */
         .scenario-analysis {
             background-color: #f9fcfc;
             border-left: 4px solid #0b8793;
@@ -484,22 +1455,9 @@ def load_scenerio_analysis(logger):
             border-radius: 0 5px 5px 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        
-        .scenario-analysis h3 {
-            color: #0b8793;
-            margin-bottom: 15px;
-        }
-        
-        .scenario-analysis ul {
-            padding-left: 20px;
-        }
-        
-        .scenario-analysis li {
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-        
-        /* Scenario header styling */
+        .scenario-analysis h3 { color: #0b8793; margin-bottom: 15px; }
+        .scenario-analysis ul { padding-left: 20px; }
+        .scenario-analysis li { margin-bottom: 8px; line-height: 1.5; }
         h2 {
             color: #0b8793;
             border-bottom: 2px solid #73C8A9;
@@ -507,8 +1465,6 @@ def load_scenerio_analysis(logger):
             margin-top: 30px;
             margin-bottom: 20px;
         }
-        
-        /* Clustering Section */
         .clustering-section {
             background-color: #f8f9fa;
             padding: 20px;
@@ -517,7 +1473,6 @@ def load_scenerio_analysis(logger):
             border-left: 4px solid #0b8793;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        
         .cluster-chart {
             background-color: white;
             border-radius: 8px;
@@ -525,15 +1480,6 @@ def load_scenerio_analysis(logger):
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             margin-top: 15px;
         }
-        
-        .feature-selector {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid #e0e0e0;
-        }
-        
         .cluster-insights {
             background-color: #f0f7fa;
             padding: 15px;
@@ -541,357 +1487,305 @@ def load_scenerio_analysis(logger):
             margin-top: 15px;
             border-left: 3px solid #0b8793;
         }
-        
-        /* Style for the active navigation item */
-        .nav-link-selected {
-            background-color: transparent !important;
-            position: relative !important;
-            box-shadow: none !important;
-        }
-        
-        /* Navigation menu styling */
-        .nav-link {
-            transition: all 0.3s ease !important;
-            border-radius: 0px !important;
-        }
-        
-        /* Hover effect for navigation links */
-        .nav-link:hover {
-            transform: translateY(-2px) !important;
-        }
-        
-        /* Hide default Streamlit elements */
+        .nav-link { transition: all 0.3s ease !important; border-radius: 0px !important; }
+        .nav-link:hover { transform: translateY(-2px) !important; }
         </style>
     """, unsafe_allow_html=True)
 
-    # Add the toggle button at the top with a narrower column
+    # ── Toggle button ──────────────────────────────────────────────────────────
     toggle_col1, toggle_col2 = st.columns([1, 11])
     with toggle_col1:
-        st.button(st.session_state.button_text, key="toggle_sidebar_button", on_click=toggle_sidebar)
+        st.button(
+            st.session_state.button_text,
+            key="toggle_sidebar_button",
+            on_click=toggle_sidebar,
+        )
 
-    # Streamlit UI
+    # ── Sidebar content ────────────────────────────────────────────────────────
     st.sidebar.image("images/iesa_white.svg", width=200)
-    st.sidebar.markdown("""<h2>IESA Scenario Analysis</h2>""", unsafe_allow_html=True)
+    st.sidebar.markdown("<h2>IESA Scenario Analysis</h2>", unsafe_allow_html=True)
 
-    # Fetch available scenarios from DB
+    # Fetch scenarios from Supabase
     scenarios_df = fetch_scenarios()
-    scenario_categories = {category: list(group["scenario"]) for category, group in scenarios_df.groupby("category")}
+    if scenarios_df.empty:
+        st.warning("⚠️ Could not load scenarios from the database.")
+        return
 
-    # Sidebar - Category Selection
-    selected_category = st.sidebar.selectbox("Select Category", list(scenario_categories.keys()), key="category_select")
-
-    # Query Dictionary for Analysis
-    query_dict = {
-        "Future Electricity Demand Growth": "SELECT Year, `Consumption (GWh)`, ((`Consumption (GWh)` - LAG(`Consumption (GWh)`, 1) OVER (ORDER BY Year)) / LAG(`Consumption (GWh)`, 1) OVER (ORDER BY Year) * 100) AS Growth_Rate FROM annual_electricity_data;",
-        "Renewable Energy Contribution": "SELECT Year, `Renewable Electricity`, `Total`, (`Renewable Electricity` / `Total`) * 100 AS Renewable_Percentage FROM primary_energy_supplies_by_source_toe;",
-        "Power Shortage Risk": "SELECT Year, `Generation (GWh)`, `Consumption (GWh)`, (`Generation (GWh)` - `Consumption (GWh)`) AS Surplus_Deficit FROM annual_electricity_data;",
-        "Impact of Industrial Expansion on Electricity Demand": "SELECT Year, Industrial, (Industrial - LAG(Industrial, 1) OVER (ORDER BY Year)) / LAG(Industrial, 1) OVER (ORDER BY Year) * 100 AS Industrial_Growth_Rate FROM electricity_consumption_by_sector_gwh;",
-        "Future Gas Demand Forecast": "SELECT Year, `Natural Gas Consumption`, ((`Natural Gas Consumption` - LAG(`Natural Gas Consumption`, 1) OVER (ORDER BY Year)) / LAG(`Natural Gas Consumption`, 1) OVER (ORDER BY Year)) * 100 AS Growth_Rate FROM natural_gas_production_and_consumption;",
-        "Gas Production vs. Consumption Balance": "SELECT Year, `Natural Gas Production`, `Natural Gas Consumption`, (`Natural Gas Production` - `Natural Gas Consumption`) AS Surplus_Deficit FROM natural_gas_production_and_consumption;",
-        "Total Energy Demand vs. Supply Balance": "SELECT YEAR, `Total Primary Energy Supply (MTOE)`, `Total Final Consumption of Energy (MTOE)`, (`Total Primary Energy Supply (MTOE)` - `Total Final Consumption of Energy (MTOE)`) AS Surplus_Deficit FROM energy_supply_and_consumption_analysis;",
-        "Supply Chain Disruptions in Gas Imports": "SELECT Year, `Imports` FROM total_imports_lng;",
-        "Sector-Wise Energy Consumption Changes": "SELECT Year, Total FROM sector_wise_energy_consumption;"
+    scenario_categories = {
+        category: list(group["scenario"])
+        for category, group in scenarios_df.groupby("category")
     }
 
-    # Sidebar - Multi-Select Scenarios within Category
-    selected_scenarios = st.sidebar.multiselect("Select Scenarios", scenario_categories[selected_category], key="scenarios_multiselect")
+    selected_category = st.sidebar.selectbox(
+        "Select Category",
+        list(scenario_categories.keys()),
+        key="category_select",
+    )
 
-    # Add clustering option to sidebar
+    # ── Clustering sidebar controls ────────────────────────────────────────────
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Data Clustering")
     st.sidebar.markdown("Discover patterns with K-means clustering")
     enable_clustering = st.sidebar.checkbox("Enable clustering analysis", key="enable_clustering")
 
-    # Add clustering controls when enabled
+    selected_scenarios = st.sidebar.multiselect(
+        "Select Scenarios",
+        scenario_categories[selected_category],
+        key="scenarios_multiselect",
+    )
+
     if enable_clustering and selected_scenarios:
-        # Get all data for clustering
         all_data = {}
         numeric_columns = {}
-        
-        for scenario in selected_scenarios:
-            if scenario in query_dict:
-                query = query_dict[scenario]
-                data = fetch_data(query)
-                
-                if data is not None and not data.empty:
-                    # Store data by scenario
-                    all_data[scenario] = data
-                    
-                    # Track numeric columns for each scenario (excluding Year)
-                    numeric_cols = data.select_dtypes(include=['number']).columns.tolist()
-                    if 'Year' in numeric_cols:
-                        numeric_cols.remove('Year')
-                    numeric_columns[scenario] = numeric_cols
 
-        # Only show controls if we have data with numeric columns
+        for scenario in selected_scenarios:
+            data = fetch_data(scenario)
+            if data is not None and not data.empty:
+                all_data[scenario] = data
+                numeric_cols = data.select_dtypes(include=["number"]).columns.tolist()
+                if "Year" in numeric_cols:
+                    numeric_cols.remove("Year")
+                numeric_columns[scenario] = numeric_cols
+
         if numeric_columns:
-            # Select scenario for clustering
             cluster_scenario = st.sidebar.selectbox(
                 "Select scenario for clustering",
                 options=list(numeric_columns.keys()),
-                key="cluster_scenario"
+                key="cluster_scenario",
             )
-            
-            # Select features for clustering
+
             if cluster_scenario and cluster_scenario in numeric_columns:
                 available_features = numeric_columns[cluster_scenario]
-                
                 selected_features = st.sidebar.multiselect(
                     "Select features for clustering",
                     options=available_features,
-                    default=available_features[:min(2, len(available_features))],
-                    key="clustering_features"
+                    default=available_features[: min(2, len(available_features))],
+                    key="clustering_features",
                 )
-                
-                # Number of clusters - using the session state value as default
                 num_clusters = st.sidebar.slider(
                     "Number of clusters",
                     min_value=2,
                     max_value=10,
                     value=st.session_state.num_clusters,
-                    key="num_clusters"
+                    key="num_clusters",
                 )
-                
-                # Update only the selected_features in session state
-                # (not updating num_clusters since it's bound to widget)
                 st.session_state.selected_features = selected_features
-                
-                # Run clustering button
+
                 if st.sidebar.button("Run Clustering Analysis", key="run_clustering"):
                     if len(selected_features) > 0:
                         with st.spinner("Performing clustering analysis..."):
-                            # Store the selected data for clustering
-                            scenario_data = all_data[cluster_scenario]
-                            
-                            # Run clustering using the current slider value
                             clustering_results = perform_kmeans_clustering(
-                                scenario_data, 
-                                selected_features, 
-                                num_clusters  # Using slider value directly
+                                all_data[cluster_scenario],
+                                selected_features,
+                                num_clusters,
                             )
-                            
-                            # Store results in session state
                             st.session_state.clustering_results = {
-                                'scenario': cluster_scenario,
-                                'results': clustering_results
+                                "scenario": cluster_scenario,
+                                "results":  clustering_results,
                             }
                     else:
                         st.sidebar.error("Please select at least one feature for clustering")
 
-    # Check if scenarios selection has changed and auto-hide sidebar if so
+    # Auto-hide sidebar when scenario selection changes
     if selected_scenarios and selected_scenarios != st.session_state.previous_scenarios:
-        st.session_state.current_action = "new_selection"  # Mark that selection changed
+        st.session_state.current_action = "new_selection"
         auto_hide_sidebar()
         st.session_state.previous_scenarios = selected_scenarios.copy()
 
-    # Function to create chart with fixed dimensions
+    # ── Chart builder ──────────────────────────────────────────────────────────
     def create_chart(data, scenario, y_col):
-        # Fixed dimensions for consistency
-        fixed_width = 550  # Increased fixed width
-        fixed_height = 350  # Increased fixed height
-        
-        # Create a more visible color scheme
-        color_scheme = alt.Scale(range=['#0b67a0', '#d62728', '#2ca02c', '#9467bd', '#8c564b'])
-        
-        # Create a base chart with fixed dimensions
-        base = alt.Chart(data).encode(
-            x=alt.X("Year:O", title="Year", axis=alt.Axis(
-                labelAngle=0,
-                titleFontSize=16,
-                titleFontWeight='bold',
-                labelFontSize=14,
-                labelFontWeight='bold',
-                tickWidth=2,
-                tickColor='#333333',
-                labelColor='#333333',
-                titleColor='#333333',
-                domainColor='#666666',
-                domainWidth=2
-            )),
-            y=alt.Y(y_col, title=y_col, axis=alt.Axis(
-                titleFontSize=16,
-                titleFontWeight='bold',
-                labelFontSize=14,
-                labelFontWeight='bold',
-                grid=True,
-                gridColor='#e0e0e0',
-                tickWidth=2,
-                tickColor='#333333',
-                labelColor='#333333',
-                titleColor='#333333',
-                domainColor='#666666',
-                domainWidth=2,
-                format=',.0f'  # Format numbers without decimals
-            ))
-        ).properties(
-            title={
-                "text": f"{scenario}: Year vs {y_col}",
-                "fontSize": 18,
-                "fontWeight": "bold",
-                "color": "#0b8793"
-            },
-            width=fixed_width,
-            height=fixed_height
-        )
-        
-        # Add line layer
-        line = base.mark_line(
-            strokeWidth=3.5,
-            clip=True,
-            color='#0066cc'
-        ).encode(
-            tooltip=list(data.columns)
-        )
-        
-        # Add points with enhanced visibility
-        points = base.mark_circle(
-            size=80,
-            opacity=1,
-            stroke='#fff',
-            strokeWidth=1.5,
-            color='#0066cc'
-        ).encode(
-            tooltip=list(data.columns)
-        )
-        
-        # Combine layers
-        final_chart = alt.layer(line, points).configure_view(
-            strokeWidth=1,
-            stroke='#ddd'
-        ).configure_axis(
-            domainWidth=2,
-            domainColor='#666666',
-            labelFontWeight='bold',
-            labelColor='#333333',
-            titleColor='#333333',
-            tickColor='#666666'
-        ).configure_title(
-            fontSize=18,
-            font='Arial',
-            fontWeight='bold',
-            anchor='start',
-            color='#0b8793'
-        )
-        
-        return final_chart
+        fixed_width  = 550
+        fixed_height = 350
 
-    # Loop through selected scenarios
+        base = (
+            alt.Chart(data)
+            .encode(
+                x=alt.X(
+                    "Year:O",
+                    title="Year",
+                    axis=alt.Axis(
+                        labelAngle=0,
+                        titleFontSize=16,
+                        titleFontWeight="bold",
+                        labelFontSize=14,
+                        labelFontWeight="bold",
+                        tickWidth=2,
+                        tickColor="#333333",
+                        labelColor="#333333",
+                        titleColor="#333333",
+                        domainColor="#666666",
+                        domainWidth=2,
+                    ),
+                ),
+                y=alt.Y(
+                    y_col,
+                    title=y_col,
+                    axis=alt.Axis(
+                        titleFontSize=16,
+                        titleFontWeight="bold",
+                        labelFontSize=14,
+                        labelFontWeight="bold",
+                        grid=True,
+                        gridColor="#e0e0e0",
+                        tickWidth=2,
+                        tickColor="#333333",
+                        labelColor="#333333",
+                        titleColor="#333333",
+                        domainColor="#666666",
+                        domainWidth=2,
+                        format=",.0f",
+                    ),
+                ),
+            )
+            .properties(
+                title={
+                    "text": f"{scenario}: Year vs {y_col}",
+                    "fontSize": 18,
+                    "fontWeight": "bold",
+                    "color": "#0b8793",
+                },
+                width=fixed_width,
+                height=fixed_height,
+            )
+        )
+
+        line = base.mark_line(
+            strokeWidth=3.5, clip=True, color="#0066cc"
+        ).encode(tooltip=list(data.columns))
+
+        points = base.mark_circle(
+            size=80, opacity=1, stroke="#fff", strokeWidth=1.5, color="#0066cc"
+        ).encode(tooltip=list(data.columns))
+
+        return (
+            alt.layer(line, points)
+            .configure_view(strokeWidth=1, stroke="#ddd")
+            .configure_axis(
+                domainWidth=2,
+                domainColor="#666666",
+                labelFontWeight="bold",
+                labelColor="#333333",
+                titleColor="#333333",
+                tickColor="#666666",
+            )
+            .configure_title(
+                fontSize=18,
+                font="Arial",
+                fontWeight="bold",
+                anchor="start",
+                color="#0b8793",
+            )
+        )
+
+    # ── Main content ───────────────────────────────────────────────────────────
     for scenario in selected_scenarios:
         st.markdown(f"## Scenario: {scenario}")
 
-        # Fetch data
-        if scenario in query_dict:
-            query = query_dict[scenario]
-            data = fetch_data(query)
-            
-            if data is not None and not data.empty:
-                # Dynamic Charts (Two-column layout)
-                num_cols = 2
-                cols = st.columns(num_cols)
-                y_columns = list(data.columns[1:])  # Exclude 'Year' column
+        data = fetch_data(scenario)
 
-                for idx, y_col in enumerate(y_columns):
-                    col_idx = idx % num_cols
-                    chart_key = f"{scenario}_{y_col}"
-                    
-                    # Add to tracking of currently displayed charts
-                    st.session_state.chart_keys.add(chart_key)
-                    
-                    with cols[col_idx]:
-                        # Create a fixed sized container to ensure consistency
-                        container = st.container()
-                        
-                        # Only create new chart when needed (selection changed, first load, or analysis)
-                        if (chart_key not in st.session_state.rendered_charts or 
-                            st.session_state.current_action in ["new_selection", "analysis", None]):
-                            final_chart = create_chart(data, scenario, y_col)
-                            st.session_state.rendered_charts[chart_key] = final_chart
-                        else:
-                            final_chart = st.session_state.rendered_charts[chart_key]
-                        
-                        # Use precise dimensions for chart display
-                        with container:
-                            st.altair_chart(final_chart, use_container_width=False)
-            else:
-                st.error(f"No data available for scenario: {scenario}")
+        if data is not None and not data.empty:
+            num_cols = 2
+            cols = st.columns(num_cols)
+            y_columns = list(data.columns[1:])
 
-        # AI Analysis Button for Each Scenario with auto-hide on click
-        if st.sidebar.button(f"Analyze {scenario}", on_click=auto_hide_sidebar_no_rerun, key=f"analyze_{scenario}"):
-            st.session_state.current_action = "analysis"  # Mark that we're running analysis
-            with st.spinner(f"Analyzing {scenario}... This may take a moments"):
+            for idx, y_col in enumerate(y_columns):
+                col_idx   = idx % num_cols
+                chart_key = f"{scenario}_{y_col}"
+                st.session_state.chart_keys.add(chart_key)
+
+                with cols[col_idx]:
+                    container = st.container()
+                    if (
+                        chart_key not in st.session_state.rendered_charts
+                        or st.session_state.current_action in ["new_selection", "analysis", None]
+                    ):
+                        final_chart = create_chart(data, scenario, y_col)
+                        st.session_state.rendered_charts[chart_key] = final_chart
+                    else:
+                        final_chart = st.session_state.rendered_charts[chart_key]
+
+                    with container:
+                        st.altair_chart(final_chart, use_container_width=False)
+        else:
+            st.error(f"No data available for scenario: {scenario}")
+
+        # AI analysis button
+        if st.sidebar.button(
+            f"Analyze {scenario}",
+            on_click=auto_hide_sidebar_no_rerun,
+            key=f"analyze_{scenario}",
+        ):
+            st.session_state.current_action = "analysis"
+            with st.spinner(f"Analyzing {scenario}… This may take a moment"):
                 analysis_tool = ScenarioAnalysisTool()
-                data_string = data.to_string(index=False)
-                analysis = analysis_tool.forward(scenario, data_string)
-                # Store analysis in session state
+                data_string   = data.to_string(index=False)
+                analysis      = analysis_tool.forward(scenario, data_string)
                 st.session_state.scenario_analyses[scenario] = analysis
-            
-        # Display saved analyses for this scenario
+
         if scenario in st.session_state.scenario_analyses:
             st.subheader(f"Analysis for {scenario}")
-            # Wrap the analysis in a styled div
-            st.markdown(f'<div class="scenario-analysis">{st.session_state.scenario_analyses[scenario]}</div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="scenario-analysis">'
+                f'{st.session_state.scenario_analyses[scenario]}'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
 
-    # Display clustering results if available
-    if enable_clustering and 'clustering_results' in st.session_state and st.session_state.clustering_results:
+    # ── Clustering results ─────────────────────────────────────────────────────
+    if (
+        enable_clustering
+        and "clustering_results" in st.session_state
+        and st.session_state.clustering_results
+    ):
         st.markdown("---")
         st.markdown("## Cluster Analysis")
-        
-        # Get clustering results from session state
+
         cluster_data = st.session_state.clustering_results
-        scenario = cluster_data['scenario']
-        results = cluster_data['results']
-        features = results['features']
-        
-        # Create a styled container for the clustering section
+        scenario     = cluster_data["scenario"]
+        results      = cluster_data["results"]
+        features     = results["features"]
+
         st.markdown('<div class="clustering-section">', unsafe_allow_html=True)
-        
-        # Display information about the clustering
         st.subheader(f"K-means Clustering for '{scenario}'")
-        st.markdown(f"""
-        <div class="cluster-insights">
-            <h4>Clustering Information:</h4>
-            <ul>
-                <li><strong>Number of clusters:</strong> {st.session_state.num_clusters}</li>
-                <li><strong>Features used:</strong> {", ".join(features)}</li>
-                <li><strong>Clustering metric (inertia):</strong> {results['inertia']:.2f}</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Display the cluster chart
+        st.markdown(
+            f"""
+            <div class="cluster-insights">
+                <h4>Clustering Information:</h4>
+                <ul>
+                    <li><strong>Number of clusters:</strong> {st.session_state.num_clusters}</li>
+                    <li><strong>Features used:</strong> {", ".join(features)}</li>
+                    <li><strong>Clustering metric (inertia):</strong> {results["inertia"]:.2f}</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
         st.markdown('<div class="cluster-chart">', unsafe_allow_html=True)
-        cluster_chart = create_cluster_chart(results, features)
-        st.altair_chart(cluster_chart, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Display cluster statistics
+        st.altair_chart(create_cluster_chart(results, features), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
         st.subheader("Cluster Statistics")
-        
-        # Get the clustered data
-        clustered_df = results['data'].dropna(subset=['Cluster'])
-        
-        # Calculate statistics per cluster
-        cluster_stats = clustered_df.groupby('Cluster')[features].agg(['mean', 'min', 'max', 'std']).round(2)
+        clustered_df  = results["data"].dropna(subset=["Cluster"])
+        cluster_stats = clustered_df.groupby("Cluster")[features].agg(
+            ["mean", "min", "max", "std"]
+        ).round(2)
         st.dataframe(cluster_stats, use_container_width=True)
-        
-        # Show a sample of data points from each cluster
+
         st.subheader("Samples from Each Cluster")
-        
-        # Create tabs for each cluster
         tabs = st.tabs([f"Cluster {i}" for i in range(st.session_state.num_clusters)])
         for i, tab in enumerate(tabs):
             with tab:
-                cluster_samples = clustered_df[clustered_df['Cluster'] == i].reset_index(drop=True)
-                if not cluster_samples.empty:
-                    st.dataframe(cluster_samples[['Year'] + features], use_container_width=True)
+                samples = clustered_df[clustered_df["Cluster"] == i].reset_index(drop=True)
+                if not samples.empty:
+                    st.dataframe(samples[["Year"] + features], use_container_width=True)
                 else:
                     st.info(f"No data points in Cluster {i}")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
 
-    # Check if we should rerun the app at the end
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # ── Rerun if needed ────────────────────────────────────────────────────────
     if st.session_state.should_rerun:
         st.session_state.should_rerun = False
-        # Reset current action after rerun
         st.session_state.current_action = None
         st.rerun()
