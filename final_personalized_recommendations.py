@@ -1312,7 +1312,7 @@ def load_personalized_recommendations(logger):
     # ── Model ──────────────────────────────────────────────────────────────────
     def get_model():
         try:
-            api_key = st.secrets["groq_api_key"]  # adjust key name to match your secrets
+            api_key = st.secrets["api_keys"]  # adjust key name to match your secrets
         except KeyError as e:
             st.error(f"Secret not found: {e}. Check your secrets.toml key name.")
             return None
