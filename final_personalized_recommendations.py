@@ -1306,20 +1306,56 @@ def load_personalized_recommendations(logger):
         api_key = st.secrets.get("api_keys", "").strip()
     except Exception:
         api_key = None
-
+# TEMPORARY DEBUG — remove after confirming keys are visible
+    with st.expander("🔑 Debug: secrets keys present"):
+        st.write(list(st.secrets.keys()))
     # ── Model ──────────────────────────────────────────────────────────────────
     def get_model():
-        if not api_key:
-            st.error("No API key found in secrets!")
+        try:
+            api_key = st.secrets["groq_api_key"]  # adjust key name to match your secrets
+        except KeyError as e:
+            st.error(f"Secret not found: {e}. Check your secrets.toml key name.")
             return None
+
+        if not api_key or not api_key.strip():
+            st.error("API key is empty. Check your Streamlit secrets.")
+            return None
+
         try:
             return GroqModel(
                 'llama-3.3-70b-versatile',
-                provider=GroqProvider(api_key)
+                provider=GroqProvider(api_key.strip())
             )
         except Exception as e:
-            st.error(f"API key failed: {repr(e)}")
+            st.error(f"Failed to initialise GroqModel: {repr(e)}")
             return None
+
+
+    async def get_response(user_input):
+        st.session_state.conversation_history.append({"role": "user", "content": user_input})
+        
+        model = get_model()
+        if model is None:
+            return "Model initialisation failed. Check the error above."
+
+        try:
+            agent = Agent(model=model)
+            last_message = st.session_state.conversation_history[-1]
+            prompt = (
+                "🔹 IESA AI Assistant: Provide energy-saving recommendations based on the user's query. "
+                "Suggest cost-effective strategies even if no cost data is available. "
+                "Consider solar panels, battery storage, and demand-side management as options"
+            )
+            result = await agent.run(
+                prompt + "\n" + st.session_state.knowledge_base + "\n"
+                + f"User: {last_message['content']}"
+            )
+            response = result.data
+            st.session_state.conversation_history.append({"role": "assistant", "content": response})
+            return response
+        except Exception as e:
+            st.error(f"Groq API call failed: {repr(e)}")   # now you'll see the real error
+            return f"API call failed: {repr(e)}"
 
     # ── Sidebar ────────────────────────────────────────────────────────────────
     st.sidebar.markdown("<h1>IESA Assistant</h1>", unsafe_allow_html=True)
