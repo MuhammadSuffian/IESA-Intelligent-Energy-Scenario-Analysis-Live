@@ -1350,7 +1350,8 @@ def load_personalized_recommendations(logger):
                 prompt + "\n" + st.session_state.knowledge_base + "\n"
                 + f"User: {last_message['content']}"
             )
-            response = result.data
+            # ✅ Correct
+            response = result.output if hasattr(result, 'output') else str(result)
             st.session_state.conversation_history.append({"role": "assistant", "content": response})
             return response
         except Exception as e:
@@ -1391,7 +1392,8 @@ def load_personalized_recommendations(logger):
                 result = await agent.run(
                     prompt + "\n" + st.session_state.knowledge_base + "\n" + conversation_text
                 )
-                response = result.data
+                # ✅ Correct
+                response = result.output if hasattr(result, 'output') else str(result)
                 st.session_state.conversation_history.append({"role": "assistant", "content": response})
                 return response
             except Exception as e:
