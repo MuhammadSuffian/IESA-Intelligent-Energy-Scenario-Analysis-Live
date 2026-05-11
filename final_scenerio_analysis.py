@@ -896,7 +896,6 @@
 #         st.session_state.current_action = None
 #         st.rerun()
 
-
 import requests
 import streamlit as st
 import pandas as pd
@@ -955,10 +954,13 @@ def fetch_table_data_rest(table_name: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def fetch_query_rest(table_name: str, select_cols: str = "*", order_col: str = None) -> pd.DataFrame:
+def fetch_query_rest(table_name: str, select_cols: list = None, order_col: str = None) -> pd.DataFrame:
     """
-    Fetch data from a Supabase table with optional column selection and ordering.
-    Used to replicate the custom SQL queries from the original code.
+    Fetch data from a Supabase table.
+
+    Always fetches SELECT * then filters columns in Python to avoid the
+    double-encoding issue PostgREST has with quoted column names containing
+    spaces or parentheses when passed through requests params dict.
     """
     try:
         supabase_url, api_key = get_supabase_creds()
@@ -968,15 +970,25 @@ def fetch_query_rest(table_name: str, select_cols: str = "*", order_col: str = N
             "Range-Unit": "items",
             "Range": "0-",
         }
-        params = {"select": select_cols}
+        params = {"select": "*"}
         if order_col:
-            params["order"] = order_col
+            params["order"] = f"{order_col}.asc"
+
         resp = requests.get(url, headers=headers, params=params, timeout=20)
         resp.raise_for_status()
         rows = resp.json()
         if not rows:
             return pd.DataFrame()
-        return pd.DataFrame(rows)
+
+        df = pd.DataFrame(rows)
+
+        # Keep only requested columns, preserving order
+        if select_cols and select_cols != ["*"]:
+            existing = [c for c in select_cols if c in df.columns]
+            if existing:
+                df = df[existing]
+
+        return df
     except Exception as e:
         st.error(f"Error fetching data: {e}")
         return pd.DataFrame()
@@ -1052,7 +1064,7 @@ def load_scenerio_analysis(logger):
         """Fetch scenario_definitions table: category + scenario columns."""
         return fetch_query_rest(
             "scenario_definitions",
-            select_cols="category,scenario",
+            select_cols=["category", "scenario"],
             order_col="category",
         )
 
@@ -1112,16 +1124,10 @@ def load_scenerio_analysis(logger):
         if scenario_key not in table_map:
             return pd.DataFrame()
 
-        table  = table_map[scenario_key]
-        cols   = col_map.get(scenario_key, ["*"])
+        table = table_map[scenario_key]
+        cols  = col_map.get(scenario_key, ["*"])
 
-        # URL-encode column names that contain spaces/parentheses
-        select_str = ",".join(
-            f'"{c}"' if any(ch in c for ch in " ()") else c
-            for c in cols
-        )
-
-        df = fetch_query_rest(table, select_cols=select_str, order_col="Year")
+        df = fetch_query_rest(table, select_cols=cols, order_col="Year")
         if df.empty:
             return df
 
