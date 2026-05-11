@@ -371,8 +371,8 @@ def energy_by_souce_dashboard():
         with col1:
             if len(supplies_data_columns) > 1:
                 chart1 = alt.Chart(supplies_data).mark_bar(color="#1F77B4").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
-                    y=alt.Y(supplies_data_columns[1], title=supplies_data_columns[1])
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
+                    y=alt.Y(supplies_data_columns[2], title=supplies_data_columns[2])
                 ).properties(title="Oil")
                 st.altair_chart(chart1, use_container_width=True)
             else:
@@ -381,7 +381,7 @@ def energy_by_souce_dashboard():
         with col2:
             if len(supplies_data_columns) > 2:
                 chart2 = alt.Chart(supplies_data).mark_bar(color="#2CA02C").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
                     y=alt.Y(supplies_data_columns[2], title=supplies_data_columns[2])
                 ).properties(title="Gas")
                 st.altair_chart(chart2, use_container_width=True)
