@@ -1064,11 +1064,25 @@ def load_prediction_engine(logger):
     def preprocess_x_column(data, x_column):
         if data[x_column].dtype == 'object':
             try:
-                data[x_column] = data[x_column].astype(str).str[:4].astype(int)
+                # Handles "2018-19", "2018-2019", "2018" — always takes first 4 digits
+                data[x_column] = (
+                    data[x_column]
+                    .astype(str)
+                    .str.extract(r'(\d{4})')[0]  # pulls first 4-digit number
+                    .astype(int)
+                )
             except Exception:
                 encoder = LabelEncoder()
-                data[x_column] = encoder.fit_transform(data[x_column])
+                data[x_column] = encoder.fit_transform(data[x_column].astype(str))
         return data
+    def get_x_max(data, x_column):
+        """Safely return a plain Python int from the x column max."""
+        val = data[x_column].max()
+        try:
+            return int(val)
+        except (ValueError, TypeError):
+            # Last resort: try extracting digits
+            return int(str(val)[:4])
 
     # ── Regression models ──────────────────────────────────────────────────────
     def perform_linear_regression(data, x_column, y_column):
@@ -1077,7 +1091,7 @@ def load_prediction_engine(logger):
         model = LinearRegression()
         
         # ✅ FIX: cast max() to int to guarantee numeric arithmetic
-        x_max = int(data[x_column].max())
+        x_max = get_x_max(data, x_column)
         future_data = pd.DataFrame({
             x_column: np.arange(x_max + 1, x_max + 6)
         })
@@ -1090,7 +1104,7 @@ def load_prediction_engine(logger):
         poly = PolynomialFeatures(degree=3)
         x_poly = poly.fit_transform(x)
         model = LinearRegression().fit(x_poly, y)
-        x_max = int(data[x_column].max())   # ✅ FIX
+        x_max = get_x_max(data, x_column)  # ✅ FIX
         future_data = pd.DataFrame({
             x_column: np.arange(x_max + 1, x_max + 6)
         })
@@ -1101,7 +1115,7 @@ def load_prediction_engine(logger):
         data = preprocess_x_column(data, x_column)
         x, y = data[[x_column]].values, data[[y_column]].values
         model = RandomForestRegressor(n_estimators=100, random_state=42).fit(x, y)
-        x_max = int(data[x_column].max())   # ✅ FIX
+        x_max = get_x_max(data, x_column)  # ✅ FIX
         future_data = pd.DataFrame({
             x_column: np.arange(x_max + 1, x_max + 6)
         })
@@ -1117,7 +1131,7 @@ def load_prediction_engine(logger):
         y_scaled = y_scaler.fit_transform(y.reshape(-1, 1)).flatten()
         model = SVR(kernel="rbf", C=100, gamma=0.1, epsilon=0.1)
         model.fit(x_scaled, y_scaled)
-        x_max = int(data[x_column].max())   # ✅ FIX
+        x_max = get_x_max(data, x_column)  # ✅ FIX
         future_x = np.arange(x_max + 1, x_max + 6).reshape(-1, 1)
         future_x_scaled = x_scaler.transform(future_x)
         future_y = y_scaler.inverse_transform(
