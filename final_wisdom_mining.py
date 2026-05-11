@@ -965,7 +965,6 @@
 #                                 st.error("Please try again or check your LLM service configuration.")
 #     else:
 #         st.info("Please Load data to begin analysis")
-
 import pandas as pd
 from itertools import combinations
 import requests
@@ -1744,6 +1743,7 @@ def load_wisdom_mining(logger):
             )
             if len(selected_columns) < 3:
                 st.warning("Please select at least 3 columns for meaningful analysis")
+                st.stop()   # ← wait here; nothing below runs until 3+ are chosen
             else:
                 required_columns = selected_columns
 
