@@ -1354,7 +1354,7 @@ def load_personalized_recommendations(logger):
             st.session_state.conversation_history.append({"role": "assistant", "content": response})
             return response
         except Exception as e:
-            st.error(f"Groq API call failed: {repr(e)}")   # now you'll see the real error
+            st.error(f"Groq API call failed: {repr(e)}")
             return f"API call failed: {repr(e)}"
 
     # ── Sidebar ────────────────────────────────────────────────────────────────
