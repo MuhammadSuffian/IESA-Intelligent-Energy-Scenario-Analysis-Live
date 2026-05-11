@@ -534,7 +534,7 @@ def load_dash(logger):
                 textinfo='percent+label'
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
             
         except Exception as e:
             logger.error(f"Error fetching energy mix data: {e}")
@@ -566,7 +566,7 @@ def load_dash(logger):
                 textinfo='percent+label'
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig,width='stretch')
         
         st.markdown("</div>", unsafe_allow_html=True)
         
@@ -620,7 +620,7 @@ def load_dash(logger):
             fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(230, 230, 230, 0.8)')
             fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(230, 230, 230, 0.8)')
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
             
         except Exception as e:
             logger.error(f"Error fetching energy trend data: {e}")
@@ -670,7 +670,7 @@ def load_dash(logger):
             fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(230, 230, 230, 0.8)')
             fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(230, 230, 230, 0.8)')
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
         
         st.markdown("</div>", unsafe_allow_html=True)
         
