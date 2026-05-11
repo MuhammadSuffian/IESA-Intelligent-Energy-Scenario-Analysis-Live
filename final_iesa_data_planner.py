@@ -1930,8 +1930,14 @@ from utils.logger import setup_logger
 # ── Supabase REST API config ───────────────────────────────────────────────────
 # TODO: move these to environment variables or a secrets manager before going live
 
-SUPABASE_URL = st.secrets["db_url"].rstrip("/")
-SUPABASE_KEY = st.secrets["db_api_key"]
+def get_supabase_creds():
+    """Read Supabase credentials from Streamlit secrets."""
+    url = st.secrets["db_url"].rstrip("/")
+    api_key = st.secrets["db_api_key"]
+    return url, api_key
+SUPABASE_URL, SUPABASE_KEY = get_supabase_creds()
+# SUPABASE_URL = st.secrets["db_url"].rstrip("/")
+# SUPABASE_KEY = st.secrets["db_api_key"]
 # ──────────────────────────────────────────────────────────────────────────────
 
 
