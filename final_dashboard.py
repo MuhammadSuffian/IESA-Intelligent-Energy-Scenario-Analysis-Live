@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_option_menu import option_menu
 import mysql.connector
-from mysql_con import get_connection, fetch_table_data
+# from mysql_con import get_connection, fetch_table_data
 import base64
 from PIL import Image
 import time
@@ -432,26 +432,30 @@ def load_dash(logger):
         st.subheader("📌 Key Energy Metrics Overview")
         
         # Log data fetches and metric/chart rendering
-        try:
-            conn = get_connection()
-            cursor = conn.cursor()
-            cursor.execute("select SUM(total_primary_energy_supply_mtoe) from energy_supply_and_consumption_analysis")
-            total_production = cursor.fetchone()[0]
-            cursor.execute("select SUM(total_final_consumption_energy_mtoe) from energy_supply_and_consumption_analysis")
-            total_consumption = cursor.fetchone()[0]
-            cursor.execute("select SUM(generation_gwh) from annual_electricity_data")
-            electricity_production = cursor.fetchone()[0]
-            cursor.execute("SELECT SUM(natural_gas_production) FROM natural_gas_production_and_consumption")
-            gas_production = cursor.fetchone()[0]
-            conn.close()
-            logger.info(f"Fetched metrics: production={total_production}, consumption={total_consumption}, electricity={electricity_production}, gas={gas_production}")
-        except Exception as e:
-            logger.error(f"Error fetching dashboard metrics: {e}")
-            # Fallback data if the database query fails
-            total_production = 85.7
-            total_consumption = 79.3
-            electricity_production = 41.2
-            gas_production = 33.5
+        total_production = 85.7
+        total_consumption = 79.3
+        electricity_production = 41.2
+        gas_production = 33.5
+        # try:
+        #     conn = get_connection()
+        #     cursor = conn.cursor()
+        #     cursor.execute("select SUM(total_primary_energy_supply_mtoe) from energy_supply_and_consumption_analysis")
+        #     total_production = cursor.fetchone()[0]
+        #     cursor.execute("select SUM(total_final_consumption_energy_mtoe) from energy_supply_and_consumption_analysis")
+        #     total_consumption = cursor.fetchone()[0]
+        #     cursor.execute("select SUM(generation_gwh) from annual_electricity_data")
+        #     electricity_production = cursor.fetchone()[0]
+        #     cursor.execute("SELECT SUM(natural_gas_production) FROM natural_gas_production_and_consumption")
+        #     gas_production = cursor.fetchone()[0]
+        #     conn.close()
+        #     logger.info(f"Fetched metrics: production={total_production}, consumption={total_consumption}, electricity={electricity_production}, gas={gas_production}")
+        # except Exception as e:
+        #     logger.error(f"Error fetching dashboard metrics: {e}")
+        #     # Fallback data if the database query fails
+        #     total_production = 85.7
+        #     total_consumption = 79.3
+        #     electricity_production = 41.2
+        #     gas_production = 33.5
         # Display key metrics with attractive cards
         st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
         
