@@ -391,7 +391,7 @@ def energy_by_souce_dashboard():
         with col3:
             if len(supplies_data_columns) > 3:
                 chart3 = alt.Chart(supplies_data).mark_bar(color="#D62728").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
                     y=alt.Y(supplies_data_columns[3], title=supplies_data_columns[3])
                 ).properties(title="LNG Import")
                 st.altair_chart(chart3, use_container_width=True)
@@ -404,7 +404,7 @@ def energy_by_souce_dashboard():
         with col1:
             if len(supplies_data_columns) > 4:
                 chart4 = alt.Chart(supplies_data).mark_bar(color="#FF7F0E").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
                     y=alt.Y(supplies_data_columns[4], title=supplies_data_columns[4])
                 ).properties(title="LNG Local Supply")
                 st.altair_chart(chart4, use_container_width=True)
@@ -414,7 +414,7 @@ def energy_by_souce_dashboard():
         with col2:
             if len(supplies_data_columns) > 5:
                 chart5 = alt.Chart(supplies_data).mark_bar(color="#9467BD").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
                     y=alt.Y(supplies_data_columns[5], title=supplies_data_columns[5])
                 ).properties(title="Coal")
                 st.altair_chart(chart5, use_container_width=True)
@@ -424,7 +424,7 @@ def energy_by_souce_dashboard():
         with col3:
             if len(supplies_data_columns) > 6:
                 chart6 = alt.Chart(supplies_data).mark_bar(color="#8C564B").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
                     y=alt.Y(supplies_data_columns[6], title=supplies_data_columns[6])
                 ).properties(title="Hydro Electricity")
                 st.altair_chart(chart6, use_container_width=True)
@@ -437,7 +437,7 @@ def energy_by_souce_dashboard():
         with col1:
             if len(supplies_data_columns) > 7:
                 chart7 = alt.Chart(supplies_data).mark_bar(color="#E377C2").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
                     y=alt.Y(supplies_data_columns[7], title=supplies_data_columns[7])
                 ).properties(title="Nuclear Electricity")
                 st.altair_chart(chart7, use_container_width=True)
@@ -447,7 +447,7 @@ def energy_by_souce_dashboard():
         with col2:
             if len(supplies_data_columns) > 8:
                 chart8 = alt.Chart(supplies_data).mark_bar(color="#7F7F7F").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
                     y=alt.Y(supplies_data_columns[8], title=supplies_data_columns[8])
                 ).properties(title="Imported Electricity")
                 st.altair_chart(chart8, use_container_width=True)
@@ -457,7 +457,7 @@ def energy_by_souce_dashboard():
         with col3:
             if len(supplies_data_columns) > 9:
                 chart9 = alt.Chart(supplies_data).mark_bar(color="#BCBD22").encode(
-                    x=alt.X(supplies_data_columns[0], title=supplies_data_columns[0]),
+                    x=alt.X(supplies_data_columns[1], title=supplies_data_columns[1]),
                     y=alt.Y(supplies_data_columns[9], title=supplies_data_columns[9])
                 ).properties(title="Renewable Electricity")
                 st.altair_chart(chart9, use_container_width=True)
