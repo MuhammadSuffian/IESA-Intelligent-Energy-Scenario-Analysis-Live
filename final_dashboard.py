@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_option_menu import option_menu
 import mysql.connector
-# from mysql_con import get_connection, fetch_table_data
+from mysql_con import get_connection, fetch_table_data
 import base64
 from PIL import Image
 import time
@@ -494,7 +494,8 @@ def load_dash(logger):
         
         # Log chart rendering
         try:
-            energy_mix = fetch_table_data("energy_by_source")
+            # energy_mix = fetch_table_data("energy_by_source")
+            energy_mix=""
             logger.info(f"Fetched energy mix data: {energy_mix.shape[0]} rows")
             
             # Extract the latest year data and prepare for pie chart
@@ -575,7 +576,8 @@ def load_dash(logger):
         
         # Log chart rendering
         try:
-            energy_trend = fetch_table_data("total_energy")
+            # energy_trend = fetch_table_data("total_energy")
+            energy_trend=""
             logger.info(f"Fetched energy trend data: {energy_trend.shape[0]} rows")
             
             # Create trend visualization
