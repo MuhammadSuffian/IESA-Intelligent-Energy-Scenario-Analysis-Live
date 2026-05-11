@@ -85,7 +85,6 @@ def load_dash(logger):
             position: relative !important;
             z-index: 99 !important;
             height: 2.5rem !important;
-            display: none !important;
         }
         
         /* Remove extra spacing at the top */
@@ -265,9 +264,6 @@ def load_dash(logger):
         .css-18e3th9 {
             padding-top: 0;
         }
-        #MainMenu, footer, header {
-            visibility: hidden;
-        }
         
         /* Chart container */
         .chart-container {
@@ -432,30 +428,26 @@ def load_dash(logger):
         st.subheader("📌 Key Energy Metrics Overview")
         
         # Log data fetches and metric/chart rendering
-        total_production = 85.7
-        total_consumption = 79.3
-        electricity_production = 41.2
-        gas_production = 33.5
-        # try:
-        #     conn = get_connection()
-        #     cursor = conn.cursor()
-        #     cursor.execute("select SUM(total_primary_energy_supply_mtoe) from energy_supply_and_consumption_analysis")
-        #     total_production = cursor.fetchone()[0]
-        #     cursor.execute("select SUM(total_final_consumption_energy_mtoe) from energy_supply_and_consumption_analysis")
-        #     total_consumption = cursor.fetchone()[0]
-        #     cursor.execute("select SUM(generation_gwh) from annual_electricity_data")
-        #     electricity_production = cursor.fetchone()[0]
-        #     cursor.execute("SELECT SUM(natural_gas_production) FROM natural_gas_production_and_consumption")
-        #     gas_production = cursor.fetchone()[0]
-        #     conn.close()
-        #     logger.info(f"Fetched metrics: production={total_production}, consumption={total_consumption}, electricity={electricity_production}, gas={gas_production}")
-        # except Exception as e:
-        #     logger.error(f"Error fetching dashboard metrics: {e}")
-        #     # Fallback data if the database query fails
-        #     total_production = 85.7
-        #     total_consumption = 79.3
-        #     electricity_production = 41.2
-        #     gas_production = 33.5
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("select SUM(total_primary_energy_supply_mtoe) from energy_supply_and_consumption_analysis")
+            total_production = cursor.fetchone()[0]
+            cursor.execute("select SUM(total_final_consumption_energy_mtoe) from energy_supply_and_consumption_analysis")
+            total_consumption = cursor.fetchone()[0]
+            cursor.execute("select SUM(generation_gwh) from annual_electricity_data")
+            electricity_production = cursor.fetchone()[0]
+            cursor.execute("SELECT SUM(natural_gas_production) FROM natural_gas_production_and_consumption")
+            gas_production = cursor.fetchone()[0]
+            conn.close()
+            logger.info(f"Fetched metrics: production={total_production}, consumption={total_consumption}, electricity={electricity_production}, gas={gas_production}")
+        except Exception as e:
+            logger.error(f"Error fetching dashboard metrics: {e}")
+            # Fallback data if the database query fails
+            total_production = 85.7
+            total_consumption = 79.3
+            electricity_production = 41.2
+            gas_production = 33.5
         # Display key metrics with attractive cards
         st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
         
@@ -494,8 +486,7 @@ def load_dash(logger):
         
         # Log chart rendering
         try:
-            # energy_mix = fetch_table_data("energy_by_source")
-            energy_mix=""
+            energy_mix = fetch_table_data("energy_by_source")
             logger.info(f"Fetched energy mix data: {energy_mix.shape[0]} rows")
             
             # Extract the latest year data and prepare for pie chart
@@ -576,8 +567,7 @@ def load_dash(logger):
         
         # Log chart rendering
         try:
-            # energy_trend = fetch_table_data("total_energy")
-            energy_trend=""
+            energy_trend = fetch_table_data("total_energy")
             logger.info(f"Fetched energy trend data: {energy_trend.shape[0]} rows")
             
             # Create trend visualization
