@@ -10,3 +10,54 @@
 2026-05-05 23:33:58,705 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
 2026-05-05 23:33:58,794 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
 2026-05-05 23:33:58,794 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:39:39,656 - iesa_dashboard - INFO - User navigated to Data Planner
+2026-05-05 23:39:39,656 - iesa_dashboard - INFO - User navigated to Data Planner
+2026-05-05 23:39:39,656 - iesa_dashboard - INFO - User navigated to Data Planner
+2026-05-05 23:39:40,147 - iesa_dashboard - INFO - Fetched tables: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2026-05-05 23:39:40,147 - iesa_dashboard - INFO - Fetched tables: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2026-05-05 23:39:40,147 - iesa_dashboard - INFO - Fetched tables: ['annual_electricity_data', 'electricity_consumption_by_sector_gwh', 'energy_supply_and_consumption_analysis', 'final_energy_consumption_by_source_toe', 'natural_gas_production_and_consumption', 'primary_energy_supplies_by_source_toe', 'province_wise_electricity_consumption_gwh', 'province_wise_energy_consumption', 'provincial_energy_distribution_and_transmission_losses', 'scenario_definitions', 'sector_wise_energy_consumption', 'total_imports_lng', 'total_proved_reserves', 'user_data']
+2026-05-05 23:39:40,184 - iesa_dashboard - INFO - Fetched data for table: annual_electricity_data, 17 rows
+2026-05-05 23:39:40,184 - iesa_dashboard - INFO - Fetched data for table: annual_electricity_data, 17 rows
+2026-05-05 23:39:40,184 - iesa_dashboard - INFO - Fetched data for table: annual_electricity_data, 17 rows
+2026-05-05 23:39:41,811 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:39:41,811 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:39:41,811 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:39:41,811 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:39:42,234 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:39:42,234 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:39:42,234 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:39:42,234 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:39:42,249 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:39:42,249 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:39:42,249 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:39:42,249 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:39:42,310 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:39:42,310 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:39:42,310 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:39:42,310 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:46:08,169 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:46:08,169 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:46:08,169 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:46:08,169 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:46:08,169 - iesa_dashboard - INFO - User navigated to Dashboard
+2026-05-05 23:46:08,624 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:46:08,624 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:46:08,624 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:46:08,624 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:46:08,624 - iesa_dashboard - ERROR - Error fetching dashboard metrics: 1054 (42S22): Unknown column 'total_primary_energy_supply_mtoe' in 'field list'
+2026-05-05 23:46:08,665 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:46:08,665 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:46:08,665 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:46:08,665 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:46:08,665 - iesa_dashboard - ERROR - Error fetching energy mix data: name 'pd' is not defined
+2026-05-05 23:46:08,777 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:46:08,777 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:46:08,777 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:46:08,777 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:46:08,777 - iesa_dashboard - ERROR - Error fetching energy trend data: name 'pd' is not defined
+2026-05-05 23:46:15,913 - iesa_dashboard - INFO - User navigated to Data Planner
+2026-05-05 23:46:15,913 - iesa_dashboard - INFO - User navigated to Data Planner
+2026-05-05 23:46:15,913 - iesa_dashboard - INFO - User navigated to Data Planner
+2026-05-05 23:46:15,913 - iesa_dashboard - INFO - User navigated to Data Planner
+2026-05-05 23:46:15,913 - iesa_dashboard - INFO - User navigated to Data Planner
+2026-05-05 23:46:15,913 - iesa_dashboard - INFO - User navigated to Data Planner
