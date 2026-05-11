@@ -966,8 +966,6 @@
 #     else:
 #         st.info("Please Load data to begin analysis")
 
-
-
 import pandas as pd
 from itertools import combinations
 import requests
@@ -1680,7 +1678,7 @@ def load_wisdom_mining(logger):
         return transactions
 
     # ── Main logic ─────────────────────────────────────────────────────────────
-    available_tables = ["annual_electricity_data","electricity_consumption_by_sector_gwh","energy_supply_and_consumption_analysis","final_energy_consumption_by_source_toe","natural_gas_production_and_consumption","primary_energy_supplies_by_source_toe","province_wise_electricity_consumption_gwh","province_wise_energy_consumption","provincial_energy_distribution_and_transmission_losses","scenario_definitions","sector_wise_energy_consumption","total_imports_lng","total_proved_reserves"]
+    available_tables = fetch_tables()
     if not available_tables:
         st.sidebar.error("No tables found in database")
     else:
@@ -1773,19 +1771,32 @@ def load_wisdom_mining(logger):
 
         st.header("Categorized Transactions")
 
+        def _safe_transactions_df(transactions, col_names):
+            """
+            Build a DataFrame from a list of variable-length rows.
+            Rows shorter than col_names are padded with None;
+            rows longer are truncated — so the shape always matches.
+            """
+            n = len(col_names)
+            padded = [
+                (list(row) + [None] * n)[:n]
+                for row in transactions
+            ]
+            return pd.DataFrame(padded, columns=col_names)
+
         if use_dimensions:
             original_transactions = st.session_state.transactions[
                 : len(st.session_state.df)
             ]
-            transactions_df = pd.DataFrame(original_transactions, columns=column_names)
+            transactions_df = _safe_transactions_df(original_transactions, column_names)
             st.dataframe(transactions_df)
             st.info(
                 f"Note: {len(st.session_state.transactions) - len(original_transactions)} "
                 f"additional transactions from dimensions are not shown in this view."
             )
         else:
-            transactions_df = pd.DataFrame(
-                st.session_state.transactions, columns=column_names
+            transactions_df = _safe_transactions_df(
+                st.session_state.transactions, column_names
             )
             st.dataframe(transactions_df)
 
