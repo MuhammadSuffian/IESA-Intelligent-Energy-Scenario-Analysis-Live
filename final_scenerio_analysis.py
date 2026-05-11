@@ -251,7 +251,6 @@ def load_scenerio_analysis(logger):
             position: relative !important;
             z-index: 99 !important;
             height: 2.5rem !important;
-            display: none !important;
         }
         [data-testid="stSidebar"] {
             background: linear-gradient(135deg, #73C8A9, #0b8793); /* Gradient background */
@@ -562,9 +561,6 @@ def load_scenerio_analysis(logger):
         }
         
         /* Hide default Streamlit elements */
-        #MainMenu, footer {
-            visibility: hidden;
-        }
         </style>
     """, unsafe_allow_html=True)
 
