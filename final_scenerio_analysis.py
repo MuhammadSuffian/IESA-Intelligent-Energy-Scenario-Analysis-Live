@@ -1253,13 +1253,20 @@ def load_scenerio_analysis(logger):
             )
 
     # ── AI client ─────────────────────────────────────────────────────────────
-    api_keys = None
-    try:
-        api_keys = st.secrets.get("api_keys")
-    except Exception:
-        api_keys = None
-
-    client = groq.Client(api_keys)
+    def _get_groq_api_key() -> str | None:
+        """Safely retrieve the Groq API key from Streamlit secrets."""
+        try:
+            # Support both flat key and nested [api_keys] table
+            secrets = st.secrets
+            if "groq_api_key" in secrets:
+                return secrets["groq_api_key"]
+            if "api_keys" in secrets and isinstance(secrets["api_keys"], dict):
+                return secrets["api_keys"].get("groq_api_key")
+            if "api_keys" in secrets:
+                return secrets["api_keys"]
+        except Exception:
+            pass
+        return None
 
     class ScenarioAnalysisTool(Tool):
         name = "scenario_analysis"
@@ -1271,27 +1278,34 @@ def load_scenerio_analysis(logger):
         output_type = "string"
 
         def forward(self, scenario: str, data_string: str):
-            prompt = (
-                f"Analyze the following dataset based on actual trends:\n\n"
-                f"{data_string}\n\n"
-                f"Scenario: {scenario}\n\n"
-                "Provide a concise yet informative analysis with 2-3 main sections. "
-                "Each section should have a clear heading and 2-3 bullet points with specific insights. "
-                "Focus exclusively on the data provided.\n\n"
-                "Format your response as follows:\n\n"
-                "## Key Trend Analysis\n"
-                "- Include specific numbers and percentages from the data\n"
-                "- Highlight the most significant pattern observed\n\n"
-                "## Impact Assessment\n"
-                "- Describe direct implications based on the data\n"
-                "- Use comparative analysis when relevant\n\n"
-                "Keep each bullet point concise but informative with data-backed observations."
-            )
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return response.choices[0].message.content.strip()
+            api_key = _get_groq_api_key()
+            if not api_key:
+                return "⚠️ Groq API key not found. Please add `groq_api_key` to your Streamlit secrets."
+            try:
+                _client = groq.Client(api_key)
+                prompt = (
+                    f"Analyze the following dataset based on actual trends:\n\n"
+                    f"{data_string}\n\n"
+                    f"Scenario: {scenario}\n\n"
+                    "Provide a concise yet informative analysis with 2-3 main sections. "
+                    "Each section should have a clear heading and 2-3 bullet points with specific insights. "
+                    "Focus exclusively on the data provided.\n\n"
+                    "Format your response as follows:\n\n"
+                    "## Key Trend Analysis\n"
+                    "- Include specific numbers and percentages from the data\n"
+                    "- Highlight the most significant pattern observed\n\n"
+                    "## Impact Assessment\n"
+                    "- Describe direct implications based on the data\n"
+                    "- Use comparative analysis when relevant\n\n"
+                    "Keep each bullet point concise but informative with data-backed observations."
+                )
+                response = _client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                return response.choices[0].message.content.strip()
+            except Exception as e:
+                return f"⚠️ Analysis failed: {e}"
 
     # ── CSS ────────────────────────────────────────────────────────────────────
     st.markdown("""
