@@ -814,7 +814,6 @@
 #                 st.altair_chart(combined_chart, use_container_width=True)
 
 
-
 import requests
 import pandas as pd
 import streamlit as st
@@ -1073,11 +1072,14 @@ def load_prediction_engine(logger):
 
     # ── Regression models ──────────────────────────────────────────────────────
     def perform_linear_regression(data, x_column, y_column):
-        data = preprocess_x_column(data, x_column)
+        data = preprocess_x_column(data, x_column)          # ✅ already done
         x, y = data[[x_column]].values, data[[y_column]].values
         model = LinearRegression()
+        
+        # ✅ FIX: cast max() to int to guarantee numeric arithmetic
+        x_max = int(data[x_column].max())
         future_data = pd.DataFrame({
-            x_column: np.arange(data[x_column].max() + 1, data[x_column].max() + 6)
+            x_column: np.arange(x_max + 1, x_max + 6)
         })
         future_data[y_column] = model.fit(x, y).predict(future_data[[x_column]])
         return model, future_data
@@ -1088,18 +1090,20 @@ def load_prediction_engine(logger):
         poly = PolynomialFeatures(degree=3)
         x_poly = poly.fit_transform(x)
         model = LinearRegression().fit(x_poly, y)
+        x_max = int(data[x_column].max())   # ✅ FIX
         future_data = pd.DataFrame({
-            x_column: np.arange(data[x_column].max() + 1, data[x_column].max() + 6)
+            x_column: np.arange(x_max + 1, x_max + 6)
         })
         future_data[y_column] = model.predict(poly.transform(future_data[[x_column]]))
         return model, future_data
-
+    
     def perform_random_forest_regression(data, x_column, y_column):
         data = preprocess_x_column(data, x_column)
         x, y = data[[x_column]].values, data[[y_column]].values
         model = RandomForestRegressor(n_estimators=100, random_state=42).fit(x, y)
+        x_max = int(data[x_column].max())   # ✅ FIX
         future_data = pd.DataFrame({
-            x_column: np.arange(data[x_column].max() + 1, data[x_column].max() + 6)
+            x_column: np.arange(x_max + 1, x_max + 6)
         })
         future_data[y_column] = model.predict(future_data[[x_column]])
         return model, future_data
@@ -1113,9 +1117,8 @@ def load_prediction_engine(logger):
         y_scaled = y_scaler.fit_transform(y.reshape(-1, 1)).flatten()
         model = SVR(kernel="rbf", C=100, gamma=0.1, epsilon=0.1)
         model.fit(x_scaled, y_scaled)
-        future_x = np.arange(
-            data[x_column].max() + 1, data[x_column].max() + 6
-        ).reshape(-1, 1)
+        x_max = int(data[x_column].max())   # ✅ FIX
+        future_x = np.arange(x_max + 1, x_max + 6).reshape(-1, 1)
         future_x_scaled = x_scaler.transform(future_x)
         future_y = y_scaler.inverse_transform(
             model.predict(future_x_scaled).reshape(-1, 1)
