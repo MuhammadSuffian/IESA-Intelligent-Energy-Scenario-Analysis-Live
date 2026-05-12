@@ -895,7 +895,6 @@
 #         # Reset current action after rerun
 #         st.session_state.current_action = None
 #         st.rerun()
-
 import requests
 import streamlit as st
 import pandas as pd
@@ -1076,9 +1075,12 @@ def load_scenerio_analysis(logger):
         """
         Return data for a given scenario key.
 
-        The original code used raw SQL with window functions (LAG / OVER).
-        PostgREST does not support arbitrary SQL, so we fetch the base table
-        and compute derived columns (growth rates, surplus/deficit) in Python.
+        Fetches the full table from Supabase and computes derived columns
+        (growth rates, surplus/deficit) in Python.
+
+        Column matching is done with a fuzzy resolver so minor differences
+        in casing or spacing between the hardcoded names and actual Supabase
+        column names don't cause KeyErrors.
         """
         table_map = {
             "Future Electricity Demand Growth":
@@ -1101,8 +1103,10 @@ def load_scenerio_analysis(logger):
                 "sector_wise_energy_consumption",
         }
 
+        # Canonical column names we want — used for fuzzy matching only.
+        # The resolver maps each canonical name to whatever the DB actually
+        # returned, so downstream code always uses the real column name.
         col_map = {
-            # scenario_key: list of columns to SELECT (first must be Year)
             "Future Electricity Demand Growth":
                 ["Year", "Consumption (GWh)"],
             "Renewable Energy Contribution":
@@ -1129,53 +1133,102 @@ def load_scenerio_analysis(logger):
             return pd.DataFrame()
 
         table = table_map[scenario_key]
-        cols  = col_map.get(scenario_key, ["*"])
 
-        df = fetch_query_rest(table, select_cols=cols, order_col="Year")
+        # Fetch the whole table — column filtering happens after fuzzy resolve
+        df = fetch_query_rest(table, select_cols=None, order_col="Year")
         if df.empty:
             return df
 
-        # Convert numeric cols
-        for c in cols[1:]:
-            if c in df.columns:
-                df[c] = pd.to_numeric(df[c], errors="coerce")
+        # ── Fuzzy column resolver ──────────────────────────────────────────────
+        # Build a lookup: normalised_name → actual_db_column
+        # Normalise = lowercase + strip whitespace + remove punctuation
+        import re as _re
+        def _norm(s: str) -> str:
+            return _re.sub(r"[^a-z0-9]", "", s.lower())
+
+        norm_to_actual = {_norm(c): c for c in df.columns}
+
+        def resolve(canonical: str) -> str:
+            """Return the actual DB column name closest to *canonical*."""
+            if canonical in df.columns:
+                return canonical                      # exact match
+            key = _norm(canonical)
+            if key in norm_to_actual:
+                return norm_to_actual[key]            # normalised match
+            # Partial match — find any column whose normalised name contains
+            # the canonical normalised name (handles extra words in DB names)
+            for norm_col, actual_col in norm_to_actual.items():
+                if key in norm_col or norm_col in key:
+                    return actual_col
+            return canonical                          # give up — will raise later
+
+        wanted = col_map.get(scenario_key, [])
+        # Build a rename map: actual_db_col → canonical name
+        rename = {}
+        for canonical in wanted:
+            actual = resolve(canonical)
+            if actual != canonical and actual in df.columns:
+                rename[actual] = canonical
+
+        if rename:
+            df = df.rename(columns=rename)
+
+        # Keep only the wanted canonical columns (those that now exist)
+        keep = [c for c in wanted if c in df.columns]
+        if keep:
+            df = df[keep]
+
+        # Convert numeric cols (everything except Year)
+        for c in df.columns[1:]:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
 
         # ── Compute derived columns in Python ─────────────────────────────────
+        def _safe_col(name: str) -> bool:
+            """Return True if *name* exists as a column."""
+            return name in df.columns
+
         if scenario_key == "Future Electricity Demand Growth":
-            df["Growth_Rate"] = (
-                df["Consumption (GWh)"].pct_change() * 100
-            ).round(4)
+            if _safe_col("Consumption (GWh)"):
+                df["Growth_Rate"] = (
+                    df["Consumption (GWh)"].pct_change() * 100
+                ).round(4)
 
         elif scenario_key == "Renewable Energy Contribution":
-            df["Renewable_Percentage"] = (
-                df["Renewable Electricity"] / df["Total"] * 100
-            ).round(4)
+            if _safe_col("Renewable Electricity") and _safe_col("Total"):
+                df["Renewable_Percentage"] = (
+                    df["Renewable Electricity"] / df["Total"] * 100
+                ).round(4)
 
         elif scenario_key == "Power Shortage Risk":
-            df["Surplus_Deficit"] = (
-                df["Generation (GWh)"] - df["Consumption (GWh)"]
-            )
+            if _safe_col("Generation (GWh)") and _safe_col("Consumption (GWh)"):
+                df["Surplus_Deficit"] = (
+                    df["Generation (GWh)"] - df["Consumption (GWh)"]
+                )
 
         elif scenario_key == "Impact of Industrial Expansion on Electricity Demand":
-            df["Industrial_Growth_Rate"] = (
-                df["Industrial"].pct_change() * 100
-            ).round(4)
+            if _safe_col("Industrial"):
+                df["Industrial_Growth_Rate"] = (
+                    df["Industrial"].pct_change() * 100
+                ).round(4)
 
         elif scenario_key == "Future Gas Demand Forecast":
-            df["Growth_Rate"] = (
-                df["Natural Gas Consumption"].pct_change() * 100
-            ).round(4)
+            if _safe_col("Natural Gas Consumption"):
+                df["Growth_Rate"] = (
+                    df["Natural Gas Consumption"].pct_change() * 100
+                ).round(4)
 
         elif scenario_key == "Gas Production vs. Consumption Balance":
-            df["Surplus_Deficit"] = (
-                df["Natural Gas Production"] - df["Natural Gas Consumption"]
-            )
+            if _safe_col("Natural Gas Production") and _safe_col("Natural Gas Consumption"):
+                df["Surplus_Deficit"] = (
+                    df["Natural Gas Production"] - df["Natural Gas Consumption"]
+                )
 
         elif scenario_key == "Total Energy Demand vs. Supply Balance":
-            df["Surplus_Deficit"] = (
-                df["Total Primary Energy Supply (MTOE)"]
-                - df["Total Final Consumption of Energy (MTOE)"]
-            )
+            if _safe_col("Total Primary Energy Supply (MTOE)") and                _safe_col("Total Final Consumption of Energy (MTOE)"):
+                df["Surplus_Deficit"] = (
+                    df["Total Primary Energy Supply (MTOE)"]
+                    - df["Total Final Consumption of Energy (MTOE)"]
+                )
 
         return df
 
