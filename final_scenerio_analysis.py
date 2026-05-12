@@ -971,9 +971,9 @@ def fetch_query_rest(table_name: str, select_cols: list = None, order_col: str =
             "Range": "0-",
         }
         params = {"select": "*"}
-        if order_col:
-            params["order"] = f"{order_col}.asc"
-
+        # NOTE: We do NOT pass order= to PostgREST because column names with
+        # capital letters or special characters get mangled by percent-encoding.
+        # Sorting is handled in Python after fetching.
         resp = requests.get(url, headers=headers, params=params, timeout=20)
         resp.raise_for_status()
         rows = resp.json()
@@ -981,6 +981,10 @@ def fetch_query_rest(table_name: str, select_cols: list = None, order_col: str =
             return pd.DataFrame()
 
         df = pd.DataFrame(rows)
+
+        # Sort in Python — avoids PostgREST case-sensitivity issues with order=
+        if order_col and order_col in df.columns:
+            df = df.sort_values(by=order_col).reset_index(drop=True)
 
         # Keep only requested columns, preserving order
         if select_cols and select_cols != ["*"]:
