@@ -812,8 +812,6 @@
                 
 #                 # Display chart
 #                 st.altair_chart(combined_chart, use_container_width=True)
-
-
 import requests
 import pandas as pd
 import streamlit as st
@@ -844,7 +842,6 @@ SUPABASE_URL, SUPABASE_KEY = get_supabase_creds()
 
 
 def _supabase_headers() -> dict:
-    """Return standard Supabase REST headers."""
     return {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
@@ -855,18 +852,12 @@ def _supabase_headers() -> dict:
 # ── Supabase data helpers ──────────────────────────────────────────────────────
 
 def fetch_tables() -> list:
-    """
-    Return table names via the PostgREST RPC get_public_tables function.
-    Falls back to a hardcoded list if the RPC call fails.
-    """
     try:
         url = f"{SUPABASE_URL}/rest/v1/rpc/get_public_tables"
         resp = requests.post(url, headers=_supabase_headers(), timeout=15)
         resp.raise_for_status()
-        data = resp.json()
-        return [row["table_name"] for row in data]
+        return [row["table_name"] for row in resp.json()]
     except Exception:
-        # Hardcoded fallback — same list used in the data planner
         return [
             "annual_electricity_data",
             "electricity_consumption_by_sector_gwh",
@@ -885,7 +876,6 @@ def fetch_tables() -> list:
 
 
 def fetch_table_data(table_name: str) -> pd.DataFrame:
-    """Fetch all rows from *table_name* via the Supabase REST API."""
     try:
         url = f"{SUPABASE_URL}/rest/v1/{table_name}"
         headers = {
@@ -932,8 +922,7 @@ def load_prediction_engine(logger):
             background-color: transparent !important;
         }
         [data-baseweb="tab-list"] {
-            border-top: none !important;
-            border-left: none !important;
+            border-top: none !important; border-left: none !important;
             border-right: none !important;
             border-bottom: 2px solid #e0e5eb !important;
             background-color: transparent !important;
@@ -942,116 +931,74 @@ def load_prediction_engine(logger):
             background-color: transparent !important;
         }
         .nav-link-selected::after {
-            content: '' !important;
-            position: absolute !important;
-            bottom: -3px !important;
-            left: 10% !important;
-            width: 80% !important;
-            height: 4px !important;
-            background-color: #73c8a9 !important;
-            border-radius: 2px !important;
+            content: '' !important; position: absolute !important;
+            bottom: -3px !important; left: 10% !important;
+            width: 80% !important; height: 4px !important;
+            background-color: #73c8a9 !important; border-radius: 2px !important;
             transition: all 0.3s ease !important;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
         }
-        .nav-link-selected {
-            color: #106466 !important;
-            font-weight: bold !important;
-        }
+        .nav-link-selected { color: #106466 !important; font-weight: bold !important; }
         #MainMenu, footer, header { visibility: hidden; }
         div[data-testid="stHorizontalBlock"] > div .stButton button {
-            background-color: #0b8793;
-            color: white !important;
-            border: 1px solid #4AC29A;
-            border-radius: 5px;
-            padding: 6px 12px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            width: auto !important;
-            min-width: 120px;
-            max-width: 150px;
-            margin: 5px auto;
-            font-size: 14px;
-            white-space: nowrap;
-            display: block;
+            background-color: #0b8793; color: white !important;
+            border: 1px solid #4AC29A; border-radius: 5px;
+            padding: 6px 12px; font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: all 0.3s ease;
+            width: auto !important; min-width: 120px; max-width: 150px;
+            margin: 5px auto; font-size: 14px; white-space: nowrap; display: block;
         }
         div[data-testid="stHorizontalBlock"] > div .stButton button:hover {
-            background-color: #4AC29A;
-            transform: translateY(-1px);
+            background-color: #4AC29A; transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        div[data-testid="stHorizontalBlock"] > div:first-child .stButton button {
-            position: relative;
-            z-index: 999;
-            width: auto !important;
-            min-width: 60px;
-            max-width: 80px;
-        }
-        [data-testid="stHorizontalBlock"] div:nth-child(4) .stButton button {
-            background-color: #4AC29A !important;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.25) !important;
-            border: 2px solid #73C8A9 !important;
-            transform: translateY(-2px);
         }
         .block-container { padding-top: 0.1rem !important; }
         .main .block-container { padding-top: 0.5rem !important; margin-top: 0 !important; }
-        div[data-testid="stHorizontalBlock"] {
-            margin-top: 10px !important;
-            margin-bottom: 20px !important;
-        }
-        [data-testid="stBaseButton-secondary"] {
-            background-color: #0b8793 !important;
-            width: 100% !important;
-            border: 1px solid #4AC29A;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            color: white !important;
-            font-weight: 600;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+
+        /* ── Sidebar regular buttons ── */
         [data-testid="stSidebar"] .stButton button {
-            width: 100%;
-            background-color: #0b8793;
-            color: white !important;
-            border: 1px solid #4AC29A;
-            border-radius: 5px;
-            font-size: 0.9em;
-            font-weight: bold;
-            padding: 8px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            width: 100%; background-color: #0b8793 !important;
+            color: white !important; border: 1px solid #4AC29A !important;
+            border-radius: 5px; font-size: 0.9em; font-weight: bold;
+            padding: 8px 20px; cursor: pointer; transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         [data-testid="stSidebar"] .stButton button:hover {
-            background-color: #4AC29A;
-            color: white !important;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+            background-color: #4AC29A !important; color: white !important;
+            transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.15);
         }
+
+        /* ── Download button fix ── */
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] button,
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] > button {
+            width: 100% !important; background-color: #0b8793 !important;
+            color: white !important; border: 1px solid #4AC29A !important;
+            border-radius: 5px !important; font-size: 0.9em !important;
+            font-weight: bold !important; padding: 8px 20px !important;
+            cursor: pointer !important; transition: all 0.3s ease !important;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] button:hover,
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] > button:hover {
+            background-color: #4AC29A !important; color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15) !important;
+        }
+
         [data-testid="stWidgetLabel"] { color: white !important; margin-bottom: 10px; }
         [data-testid="stSidebar"] h2 {
-            color: white;
-            font-size: 24px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255,255,255,0.2);
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            color: white; font-size: 24px;
+            padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.2);
+            margin-bottom: 20px; text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
         }
         .marks {
-            border-radius: 15px;
-            border: 1px solid #0b8793;
+            border-radius: 15px; border: 1px solid #0b8793;
             box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
-            margin-top: 20px;
-            padding: 10px;
-            width: 99%;
+            margin-top: 20px; padding: 10px; width: 99%;
         }
         .chart-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #0b8793;
-            text-align: center;
-            padding: 5px 0;
+            font-size: 18px; font-weight: bold; margin-bottom: 15px;
+            color: #0b8793; text-align: center; padding: 5px 0;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -1061,84 +1008,84 @@ def load_prediction_engine(logger):
     if "chart_paths" not in st.session_state: st.session_state.chart_paths = []
 
     # ── Preprocessing ──────────────────────────────────────────────────────────
-    def preprocess_x_column(data, x_column):
-        if data[x_column].dtype == 'object':
-            try:
-                # Handles "2018-19", "2018-2019", "2018" — always takes first 4 digits
-                data[x_column] = (
-                    data[x_column]
-                    .astype(str)
-                    .str.extract(r'(\d{4})')[0]  # pulls first 4-digit number
-                    .astype(int)
-                )
-            except Exception:
-                encoder = LabelEncoder()
-                data[x_column] = encoder.fit_transform(data[x_column].astype(str))
-        return data
-    def get_x_max(data, x_column):
-        """Safely return a plain Python int from the x column max."""
-        val = data[x_column].max()
-        try:
-            return int(val)
-        except (ValueError, TypeError):
-            # Last resort: try extracting digits
-            return int(str(val)[:4])
+    def preprocess_data(data: pd.DataFrame, x_column: str, y_column: str):
+        """
+        Return a clean (data_clean, x_array, y_array, x_max) tuple.
+
+        Handles fiscal-year strings like '2002-03', '2018-19', '2018-2019'
+        by extracting the first 4-digit year.  Falls back to LabelEncoder for
+        any other non-numeric strings.
+
+        The function works on a COPY so it never mutates the caller's DataFrame.
+        """
+        df = data[[x_column, y_column]].copy()
+
+        # ── X column ──────────────────────────────────────────────────────────
+        if df[x_column].dtype == object or pd.api.types.is_string_dtype(df[x_column]):
+            extracted = (
+                df[x_column]
+                .astype(str)
+                .str.extract(r'(\d{4})')[0]   # first 4-digit run  e.g. '2002-03' → '2002'
+            )
+            if extracted.notna().all():
+                df[x_column] = extracted.astype(int)
+            else:
+                # Fallback for truly non-year strings
+                enc = LabelEncoder()
+                df[x_column] = enc.fit_transform(df[x_column].astype(str))
+        else:
+            df[x_column] = pd.to_numeric(df[x_column], errors="coerce")
+
+        # ── Y column ──────────────────────────────────────────────────────────
+        df[y_column] = pd.to_numeric(df[y_column], errors="coerce")
+
+        # Drop rows where either column is NaN after conversion
+        df = df.dropna(subset=[x_column, y_column]).reset_index(drop=True)
+
+        x_array = df[[x_column]].values.astype(float)
+        y_array = df[[y_column]].values.astype(float)
+        x_max   = int(df[x_column].max())
+
+        return df, x_array, y_array, x_max
 
     # ── Regression models ──────────────────────────────────────────────────────
     def perform_linear_regression(data, x_column, y_column):
-        data = preprocess_x_column(data, x_column)          # ✅ already done
-        x, y = data[[x_column]].values, data[[y_column]].values
-        model = LinearRegression()
-        
-        # ✅ FIX: cast max() to int to guarantee numeric arithmetic
-        x_max = get_x_max(data, x_column)
-        future_data = pd.DataFrame({
-            x_column: np.arange(x_max + 1, x_max + 6)
-        })
-        future_data[y_column] = model.fit(x, y).predict(future_data[[x_column]])
-        return model, future_data
+        df, x, y, x_max = preprocess_data(data, x_column, y_column)
+        model = LinearRegression().fit(x, y)
+        future_x = pd.DataFrame({x_column: np.arange(x_max + 1, x_max + 6)})
+        future_x[y_column] = model.predict(future_x[[x_column]].values.astype(float))
+        return model, future_x, df          # also return cleaned df for charting
 
     def perform_polynomial_regression(data, x_column, y_column):
-        data = preprocess_x_column(data, x_column)
-        x, y = data[[x_column]].values, data[[y_column]].values
-        poly = PolynomialFeatures(degree=3)
-        x_poly = poly.fit_transform(x)
-        model = LinearRegression().fit(x_poly, y)
-        x_max = get_x_max(data, x_column)  # ✅ FIX
-        future_data = pd.DataFrame({
-            x_column: np.arange(x_max + 1, x_max + 6)
-        })
-        future_data[y_column] = model.predict(poly.transform(future_data[[x_column]]))
-        return model, future_data
-    
+        df, x, y, x_max = preprocess_data(data, x_column, y_column)
+        poly  = PolynomialFeatures(degree=3)
+        model = LinearRegression().fit(poly.fit_transform(x), y)
+        future_x = pd.DataFrame({x_column: np.arange(x_max + 1, x_max + 6)})
+        future_x[y_column] = model.predict(
+            poly.transform(future_x[[x_column]].values.astype(float))
+        )
+        return model, future_x, df
+
     def perform_random_forest_regression(data, x_column, y_column):
-        data = preprocess_x_column(data, x_column)
-        x, y = data[[x_column]].values, data[[y_column]].values
-        model = RandomForestRegressor(n_estimators=100, random_state=42).fit(x, y)
-        x_max = get_x_max(data, x_column)  # ✅ FIX
-        future_data = pd.DataFrame({
-            x_column: np.arange(x_max + 1, x_max + 6)
-        })
-        future_data[y_column] = model.predict(future_data[[x_column]])
-        return model, future_data
+        df, x, y, x_max = preprocess_data(data, x_column, y_column)
+        model = RandomForestRegressor(n_estimators=100, random_state=42).fit(x, y.ravel())
+        future_x = pd.DataFrame({x_column: np.arange(x_max + 1, x_max + 6)})
+        future_x[y_column] = model.predict(future_x[[x_column]].values.astype(float))
+        return model, future_x, df
 
     def perform_svr(data, x_column, y_column):
-        data = preprocess_x_column(data, x_column)
-        x, y = data[[x_column]].values, data[y_column].values
+        df, x, y, x_max = preprocess_data(data, x_column, y_column)
         x_scaler = StandardScaler()
         y_scaler = StandardScaler()
         x_scaled = x_scaler.fit_transform(x)
-        y_scaled = y_scaler.fit_transform(y.reshape(-1, 1)).flatten()
-        model = SVR(kernel="rbf", C=100, gamma=0.1, epsilon=0.1)
-        model.fit(x_scaled, y_scaled)
-        x_max = get_x_max(data, x_column)  # ✅ FIX
-        future_x = np.arange(x_max + 1, x_max + 6).reshape(-1, 1)
-        future_x_scaled = x_scaler.transform(future_x)
+        y_scaled = y_scaler.fit_transform(y).ravel()
+        model = SVR(kernel="rbf", C=100, gamma=0.1, epsilon=0.1).fit(x_scaled, y_scaled)
+        future_x_raw = np.arange(x_max + 1, x_max + 6).reshape(-1, 1).astype(float)
         future_y = y_scaler.inverse_transform(
-            model.predict(future_x_scaled).reshape(-1, 1)
-        ).flatten()
-        future_data = pd.DataFrame({x_column: future_x.flatten(), y_column: future_y})
-        return model, future_data
+            model.predict(x_scaler.transform(future_x_raw)).reshape(-1, 1)
+        ).ravel()
+        future_df = pd.DataFrame({x_column: future_x_raw.ravel(), y_column: future_y})
+        return model, future_df, df
 
     # ── PDF report ─────────────────────────────────────────────────────────────
     def create_prediction_report(chart_paths=None):
@@ -1146,7 +1093,6 @@ def load_prediction_engine(logger):
         c = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
 
-        # Header
         c.setStrokeColor(colors.HexColor("#F06C00"))
         c.setLineWidth(2)
         c.line(20, height - 45, width - 20, height - 45)
@@ -1154,30 +1100,20 @@ def load_prediction_engine(logger):
             c.drawImage(ImageReader(LOGO_PATH), width - 80, height - 42,
                         width=60, height=24, mask='auto')
 
-        # Title
         c.setFillColor(colors.HexColor("#504B38"))
         c.setFont("Helvetica-Bold", 22)
-        title_text = "Prediction Engine Report"
-        c.drawString(
-            (width - c.stringWidth(title_text, "Helvetica-Bold", 22)) / 2,
-            height - 100, title_text
-        )
+        tt = "Prediction Engine Report"
+        c.drawString((width - c.stringWidth(tt, "Helvetica-Bold", 22)) / 2, height - 100, tt)
 
-        # Description
         c.setFillColor(colors.black)
         c.setFont("Helvetica", 11)
         desc = "This report presents predictive modeling results using various regression algorithms."
-        c.drawString(
-            (width - c.stringWidth(desc, "Helvetica", 11)) / 2,
-            height - 130, desc
-        )
+        c.drawString((width - c.stringWidth(desc, "Helvetica", 11)) / 2, height - 130, desc)
 
-        # Divider
         c.setStrokeColor(colors.HexColor("#0b8793"))
         c.setLineWidth(1)
         c.line(60, height - 160, width - 60, height - 160)
 
-        # Section heading
         model_y = height - 190
         c.setFillColor(colors.HexColor("#0b8793"))
         c.setFont("Helvetica-Bold", 16)
@@ -1189,7 +1125,6 @@ def load_prediction_engine(logger):
             "Random Forest": "Ensemble method using multiple decision trees for robust predictions.",
             "SVR":           "Support Vector Regression uses kernel functions to model complex relationships.",
         }
-
         algo_y = model_y - 25
         for algo, adesc in algo_descriptions.items():
             c.setFont("Helvetica-Bold", 10)
@@ -1200,51 +1135,40 @@ def load_prediction_engine(logger):
             c.drawString(80, algo_y - 15, adesc)
             algo_y -= 30
 
-        if chart_paths and len(chart_paths) > 0:
+        if chart_paths:
             c.setStrokeColor(colors.HexColor("#0b8793"))
             c.setLineWidth(1)
             c.line(60, algo_y - 10, width - 60, algo_y - 10)
-
             chart_section_y = algo_y - 40
             c.setFillColor(colors.HexColor("#0b8793"))
             c.setFont("Helvetica-Bold", 16)
             c.drawString(60, chart_section_y, "Prediction Results")
 
-            chart_width  = 230
-            chart_height = 160
-            charts_top_y = chart_section_y - 30
-            chart1_x     = 60
-            chart2_x     = chart1_x + chart_width + 30
-            charts_bot_y = charts_top_y - chart_height - 30
+            cw, ch = 230, 160
+            ty = chart_section_y - 30
+            x1, x2 = 60, 60 + cw + 30
+            by = ty - ch - 30
 
-            for i, chart_path in enumerate(chart_paths[:4]):
-                if not os.path.exists(chart_path):
+            for i, cp in enumerate(chart_paths[:4]):
+                if not os.path.exists(cp):
                     continue
-                row   = i // 2
-                col   = i  % 2
-                x_pos = chart1_x if col == 0 else chart2_x
-                y_pos = charts_top_y if row == 0 else charts_bot_y
-
+                row, col = divmod(i, 2)
+                xp = x1 if col == 0 else x2
+                yp = ty if row == 0 else by
                 c.setStrokeColor(colors.HexColor("#0b8793"))
-                c.roundRect(x_pos - 5, y_pos - chart_height - 5,
-                            chart_width + 10, chart_height + 10, 5, stroke=1, fill=0)
-                c.drawImage(chart_path, x_pos, y_pos - chart_height,
-                            width=chart_width, height=chart_height, mask='auto')
-
+                c.roundRect(xp - 5, yp - ch - 5, cw + 10, ch + 10, 5, stroke=1, fill=0)
+                c.drawImage(cp, xp, yp - ch, width=cw, height=ch, mask='auto')
                 if i < len(st.session_state["results"]):
-                    result = st.session_state["results"][i]
-                    chart_title = f"{result['type']} Regression"
-                    tw = c.stringWidth(chart_title, "Helvetica-Bold", 10)
+                    label = f"{st.session_state['results'][i]['type']} Regression"
+                    tw = c.stringWidth(label, "Helvetica-Bold", 10)
                     c.setFillColor(colors.HexColor("#0b8793"))
                     c.setFont("Helvetica-Bold", 10)
-                    c.drawString(x_pos + (chart_width - tw) / 2,
-                                 y_pos - chart_height - 18, chart_title)
+                    c.drawString(xp + (cw - tw) / 2, yp - ch - 18, label)
         else:
             c.setFillColor(colors.red)
             c.setFont("Helvetica", 12)
             c.drawString(60, model_y - 40, "No prediction models have been generated yet.")
 
-        # Footer
         c.setStrokeColor(colors.HexColor("#4389a2"))
         c.setLineWidth(2)
         c.line(20, 30, width - 20, 30)
@@ -1252,7 +1176,6 @@ def load_prediction_engine(logger):
         c.setFillColor(colors.gray)
         c.drawString(40, 15, "© 2025 IESA. All rights reserved.")
         c.drawString(width - 80, 15, "Page 3")
-
         c.save()
         buffer.seek(0)
         return buffer
@@ -1282,52 +1205,63 @@ def load_prediction_engine(logger):
         run_rf  = st.sidebar.button("Run Random Forest Regression")
         run_svr = st.sidebar.button("Run Support Vector Regression")
 
-        # Download button — only shown when results exist
         if st.session_state.get("results"):
             st.sidebar.markdown("---")
             st.sidebar.download_button(
-                "Download Prediction Report",
-                create_prediction_report(st.session_state.chart_paths),
-                "IESA_Prediction_Report.pdf",
-                "application/pdf",
+                label="⬇ Download Prediction Report",
+                data=create_prediction_report(st.session_state.chart_paths),
+                file_name="IESA_Prediction_Report.pdf",
+                mime="application/pdf",
             )
 
         # ── Run models ─────────────────────────────────────────────────────────
         if run_lr and x_column and y_column:
-            logger.info(f"Linear Regression run: Table={selected_table}, X={x_column}, Y={y_column}")
-            _, future_data = perform_linear_regression(data, x_column, y_column)
-            st.session_state.results.append({
-                "type": "Linear", "x_column": x_column, "y_column": y_column,
-                "data": data.copy(), "future_data": future_data.copy(),
-            })
-            st.toast("Linear Regression run!", icon="📈")
+            logger.info(f"Linear Regression: {selected_table} X={x_column} Y={y_column}")
+            try:
+                _, future_data, clean_data = perform_linear_regression(data, x_column, y_column)
+                st.session_state.results.append({
+                    "type": "Linear", "x_column": x_column, "y_column": y_column,
+                    "data": clean_data, "future_data": future_data,
+                })
+                st.toast("Linear Regression run!", icon="📈")
+            except Exception as e:
+                st.error(f"Linear Regression failed: {e}")
 
         if run_pr and x_column and y_column:
-            logger.info(f"Polynomial Regression run: Table={selected_table}, X={x_column}, Y={y_column}")
-            _, future_data = perform_polynomial_regression(data, x_column, y_column)
-            st.session_state.results.append({
-                "type": "Polynomial", "x_column": x_column, "y_column": y_column,
-                "data": data.copy(), "future_data": future_data.copy(),
-            })
-            st.toast("Polynomial Regression run!", icon="📉")
+            logger.info(f"Polynomial Regression: {selected_table} X={x_column} Y={y_column}")
+            try:
+                _, future_data, clean_data = perform_polynomial_regression(data, x_column, y_column)
+                st.session_state.results.append({
+                    "type": "Polynomial", "x_column": x_column, "y_column": y_column,
+                    "data": clean_data, "future_data": future_data,
+                })
+                st.toast("Polynomial Regression run!", icon="📉")
+            except Exception as e:
+                st.error(f"Polynomial Regression failed: {e}")
 
         if run_rf and x_column and y_column:
-            logger.info(f"Random Forest run: Table={selected_table}, X={x_column}, Y={y_column}")
-            _, future_data = perform_random_forest_regression(data, x_column, y_column)
-            st.session_state.results.append({
-                "type": "Random Forest", "x_column": x_column, "y_column": y_column,
-                "data": data.copy(), "future_data": future_data.copy(),
-            })
-            st.toast("Random Forest Regression run!", icon="🌳")
+            logger.info(f"Random Forest: {selected_table} X={x_column} Y={y_column}")
+            try:
+                _, future_data, clean_data = perform_random_forest_regression(data, x_column, y_column)
+                st.session_state.results.append({
+                    "type": "Random Forest", "x_column": x_column, "y_column": y_column,
+                    "data": clean_data, "future_data": future_data,
+                })
+                st.toast("Random Forest Regression run!", icon="🌳")
+            except Exception as e:
+                st.error(f"Random Forest failed: {e}")
 
         if run_svr and x_column and y_column:
-            logger.info(f"SVR run: Table={selected_table}, X={x_column}, Y={y_column}")
-            _, future_data = perform_svr(data, x_column, y_column)
-            st.session_state.results.append({
-                "type": "SVR", "x_column": x_column, "y_column": y_column,
-                "data": data.copy(), "future_data": future_data.copy(),
-            })
-            st.toast("SVR Regression run!", icon="🤖")
+            logger.info(f"SVR: {selected_table} X={x_column} Y={y_column}")
+            try:
+                _, future_data, clean_data = perform_svr(data, x_column, y_column)
+                st.session_state.results.append({
+                    "type": "SVR", "x_column": x_column, "y_column": y_column,
+                    "data": clean_data, "future_data": future_data,
+                })
+                st.toast("SVR Regression run!", icon="🤖")
+            except Exception as e:
+                st.error(f"SVR failed: {e}")
 
     # ── Display results ────────────────────────────────────────────────────────
     if st.session_state.get("results"):
@@ -1381,7 +1315,6 @@ def load_prediction_engine(logger):
 
                 combined_chart = actual_chart + prediction_chart
 
-                # Save for PDF (skip silently if vl-convert is missing)
                 chart_path = os.path.join(
                     chart_folder, f"{result['type']}_regression_{index}.png"
                 )
@@ -1389,6 +1322,6 @@ def load_prediction_engine(logger):
                     combined_chart.save(chart_path)
                     st.session_state.chart_paths.append(chart_path)
                 except Exception as e:
-                    logger.warning(f"Could not save chart PNG (vl-convert missing?): {e}")
+                    logger.warning(f"Could not save chart PNG: {e}")
 
                 st.altair_chart(combined_chart, use_container_width=True)
