@@ -1909,7 +1909,6 @@
 #     if st.session_state.needs_rerun:
 #         st.session_state.needs_rerun = False
 #         st.rerun()
-
 import requests
 import pandas as pd
 import streamlit as st
@@ -1917,32 +1916,26 @@ import os
 import altair as alt
 import locale
 import io
-from streamlit_option_menu import option_menu
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.platypus import Image
 from reportlab.lib.utils import ImageReader
-import math
 from textwrap import wrap
 from utils.logger import setup_logger
 
-# ── Supabase REST API config ───────────────────────────────────────────────────
-# TODO: move these to environment variables or a secrets manager before going live
 
+# ── Supabase REST API config ───────────────────────────────────────────────────
 def get_supabase_creds():
     """Read Supabase credentials from Streamlit secrets."""
     url = st.secrets["db_url"].rstrip("/")
     api_key = st.secrets["db_api_key"]
     return url, api_key
+
+
 SUPABASE_URL, SUPABASE_KEY = get_supabase_creds()
-# SUPABASE_URL = st.secrets["db_url"].rstrip("/")
-# SUPABASE_KEY = st.secrets["db_api_key"]
-# ──────────────────────────────────────────────────────────────────────────────
 
 
 def _supabase_headers() -> dict:
-    """Return standard Supabase REST headers."""
     return {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
@@ -1951,62 +1944,49 @@ def _supabase_headers() -> dict:
 
 
 def load_data_planner(logger):
-    # Initialize sidebar state and button text
-    if 'sidebar_state' not in st.session_state:
-        st.session_state.sidebar_state = 'expanded'
-    if 'button_text' not in st.session_state:
-        st.session_state.button_text = '← Hide'
-    if 'needs_rerun' not in st.session_state:
-        st.session_state.needs_rerun = False
-    if 'toggle_triggered' not in st.session_state:
-        st.session_state.toggle_triggered = False
-    if 'rendered_charts' not in st.session_state:
-        st.session_state.rendered_charts = {}
+
+    # ── Session state ──────────────────────────────────────────────────────────
+    defaults = {
+        "sidebar_state":        "expanded",
+        "button_text":          "← Hide",
+        "needs_rerun":          False,
+        "toggle_triggered":     False,
+        "rendered_charts":      {},
+        "user_actions":         [],
+        "chart_paths":          [],
+        "charts":               [],
+        "metrics":              [],
+        "selected_table":       None,
+        "chart_images_generated": False,
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
 
     # ── Sidebar helpers ────────────────────────────────────────────────────────
     def toggle_sidebar():
-        if st.session_state.sidebar_state == 'expanded':
-            st.session_state.sidebar_state = 'collapsed'
-            st.session_state.button_text = '→ Show'
+        if st.session_state.sidebar_state == "expanded":
+            st.session_state.sidebar_state = "collapsed"
+            st.session_state.button_text = "→ Show"
         else:
-            st.session_state.sidebar_state = 'expanded'
-            st.session_state.button_text = '← Hide'
+            st.session_state.sidebar_state = "expanded"
+            st.session_state.button_text = "← Hide"
         st.session_state.needs_rerun = True
         st.session_state.toggle_triggered = True
 
     def hide_sidebar():
-        st.session_state.sidebar_state = 'collapsed'
-        st.session_state.button_text = '→ Show'
+        st.session_state.sidebar_state = "collapsed"
+        st.session_state.button_text = "→ Show"
         st.session_state.needs_rerun = True
         st.session_state.toggle_triggered = False
 
-    # ── Supabase REST helpers ──────────────────────────────────────────────────
-    def fetch_tables() -> list[str]:
-        """
-        Return user-created table names from the public schema.
-
-        Uses the PostgREST /rpc/get_tables RPC if available, otherwise falls
-        back to querying the Supabase Management API or a known meta-table.
-
-        The simplest portable approach: expose a Postgres function in Supabase:
-
-            create or replace function get_public_tables()
-            returns table(table_name text) language sql stable as $$
-              select table_name::text
-              from information_schema.tables
-              where table_schema = 'public'
-                and table_type = 'BASE TABLE'
-              order by table_name;
-            $$;
-
-        Then call it via /rest/v1/rpc/get_public_tables.
-        """
+    # ── Supabase helpers ───────────────────────────────────────────────────────
+    def fetch_tables() -> list:
         try:
-            url = f"{SUPABASE_URL.rstrip('/')}/rest/v1/rpc/get_public_tables"
+            url = f"{SUPABASE_URL}/rest/v1/rpc/get_public_tables"
             resp = requests.post(url, headers=_supabase_headers(), timeout=15)
             resp.raise_for_status()
-            data = resp.json()
-            tables = [row["table_name"] for row in data]
+            tables = [row["table_name"] for row in resp.json()]
             logger.info(f"Fetched tables: {tables}")
             return tables
         except Exception as e:
@@ -2015,19 +1995,10 @@ def load_data_planner(logger):
             return []
 
     def fetch_table_data(table_name: str) -> pd.DataFrame:
-        """
-        Fetch all rows from *table_name* via the Supabase REST API.
-
-        PostgREST returns at most 1 000 rows by default.  To lift the cap for
-        large tables, either:
-          • add `"Range-Unit": "items"` + `"Range": "0-"` headers, or
-          • configure max_rows in your Supabase project settings.
-        """
         try:
-            url = f"{SUPABASE_URL.rstrip('/')}/rest/v1/{table_name}"
+            url = f"{SUPABASE_URL}/rest/v1/{table_name}"
             headers = {
                 **_supabase_headers(),
-                # Ask PostgREST to return all rows (override default 1 000 cap)
                 "Range-Unit": "items",
                 "Range": "0-",
                 "Prefer": "count=none",
@@ -2045,388 +2016,243 @@ def load_data_planner(logger):
 
     # ── Chart creation ─────────────────────────────────────────────────────────
     def create_chart(table, chart_type, x_axis, y_axis, show_values, chart_data, selected_color_scheme):
-        formatted_table = table.replace('_', ' ').title()
+        formatted_table = table.replace("_", " ").title()
         chart_title = f"{formatted_table}: {x_axis} vs {y_axis}"
-
         if len(chart_title) > 35:
-            parts = chart_title.split(': ')
+            parts = chart_title.split(": ")
             if len(parts) > 1:
                 chart_title = f"{parts[0]}:\n{parts[1]}"
 
         fixed_width  = 550
         fixed_height = 350
-        padding      = {"top": 30, "bottom": 10, "left": 10, "right": 10}
-
+        padding = {"top": 30, "bottom": 10, "left": 10, "right": 10}
         title_config = {
-            "text":       chart_title,
-            "fontSize":   16,
-            "fontWeight": "bold",
-            "color":      "#0b8793",
-            "font":       "Arial",
-            "anchor":     "middle",
-            "align":      "center",
-            "limit":      500,
-            "offset":     15,
+            "text": chart_title, "fontSize": 16, "fontWeight": "bold",
+            "color": "#0b8793", "font": "Arial", "anchor": "middle",
+            "align": "center", "limit": 500, "offset": 15,
         }
 
         if chart_type == "Bar":
             chart_data = chart_data.sort_values(by=y_axis, ascending=True)
-
             bar_chart = alt.Chart(chart_data).mark_bar().encode(
                 x=alt.X(x_axis, title=x_axis,
                     axis=alt.Axis(labelAngle=0, titleFontSize=16, labelFontSize=14,
-                                  titleFontWeight='bold', labelFontWeight='bold',
-                                  titleColor='#333333', labelColor='#333333',
-                                  grid=True, gridColor='#e0e0e0', tickSize=6, tickWidth=2)),
+                                  titleFontWeight="bold", labelFontWeight="bold",
+                                  titleColor="#333333", labelColor="#333333",
+                                  grid=True, gridColor="#e0e0e0", tickSize=6, tickWidth=2)),
                 y=alt.Y(y_axis, title=y_axis,
                     axis=alt.Axis(titleFontSize=16, labelFontSize=14,
-                                  titleFontWeight='bold', labelFontWeight='bold',
-                                  titleColor='#333333', labelColor='#333333',
-                                  grid=True, gridColor='#e0e0e0', tickSize=6, tickWidth=2)),
+                                  titleFontWeight="bold", labelFontWeight="bold",
+                                  titleColor="#333333", labelColor="#333333",
+                                  grid=True, gridColor="#e0e0e0", tickSize=6, tickWidth=2)),
                 color=alt.Color(y_axis, scale=alt.Scale(scheme=selected_color_scheme), legend=None),
-                tooltip=[x_axis, alt.Tooltip(y_axis, format=',d')],
+                tooltip=[x_axis, alt.Tooltip(y_axis, format=",d")],
             )
-
             if show_values:
                 try:
-                    chart_data_copy = chart_data.copy()
-                    chart_data_copy['value_for_display'] = chart_data_copy[y_axis].fillna(0).replace([float('inf'), -float('inf')], 0)
-                    min_value = chart_data_copy['value_for_display'].min()
-                    if min_value > 0:
-                        chart_data_copy['display_value'] = ((chart_data_copy['value_for_display'] - min_value) / min_value * 100).round(0).astype(int).clip(lower=0)
-                        chart_data_copy.loc[chart_data_copy['value_for_display'] == min_value, 'display_value'] = 0
-                        chart_data_copy['display_text'] = chart_data_copy['display_value'].astype(str)
+                    d = chart_data.copy()
+                    d["_v"] = d[y_axis].fillna(0).replace([float("inf"), -float("inf")], 0)
+                    min_v = d["_v"].min()
+                    if min_v > 0:
+                        d["_txt"] = ((d["_v"] - min_v) / min_v * 100).round(0).clip(lower=0).astype(int).astype(str)
+                        d.loc[d["_v"] == min_v, "_txt"] = "0"
                     else:
-                        chart_data_copy['display_text'] = chart_data_copy['value_for_display'].astype(int).astype(str)
-
-                    text = alt.Chart(chart_data_copy).mark_text(
-                        align='center', baseline='middle', dy=-14, fontSize=14,
-                        fontWeight='bold', stroke='white', strokeWidth=0.5, strokeOpacity=0.8,
-                    ).encode(
-                        x=alt.X(x_axis), y=alt.Y(y_axis),
-                        text='display_text:N', color=alt.value('#000000'),
-                    )
+                        d["_txt"] = d["_v"].astype(int).astype(str)
+                    text = alt.Chart(d).mark_text(
+                        align="center", baseline="middle", dy=-14, fontSize=14,
+                        fontWeight="bold", stroke="white", strokeWidth=0.5, strokeOpacity=0.8,
+                    ).encode(x=alt.X(x_axis), y=alt.Y(y_axis), text="_txt:N", color=alt.value("#000000"))
                     chart = (bar_chart + text).properties(title=title_config, width=fixed_width, height=fixed_height)
                 except Exception as e:
-                    st.warning(f"Could not display values on chart: {str(e)}")
+                    st.warning(f"Could not display values on chart: {e}")
                     chart = bar_chart.properties(title=title_config, width=fixed_width, height=fixed_height)
             else:
                 chart = bar_chart.properties(title=title_config, width=fixed_width, height=fixed_height)
 
             chart = chart.configure_view(
-                strokeWidth=1, stroke='#cccccc',
+                strokeWidth=1, stroke="#cccccc",
                 continuousHeight=fixed_height + padding["top"] + padding["bottom"],
-                continuousWidth=fixed_width  + padding["left"] + padding["right"],
+                continuousWidth=fixed_width + padding["left"] + padding["right"],
             ).configure_axis(
-                grid=True, gridColor='#e6e6e6',
-                domainColor='#666666', tickColor='#666666',
-                domainWidth=2, tickWidth=2,
+                grid=True, gridColor="#e6e6e6", domainColor="#666666",
+                tickColor="#666666", domainWidth=2, tickWidth=2,
             ).configure_title(
-                fontSize=16, font='Arial', fontWeight='bold', anchor='middle',
-                align='center', color='#0b8793', offset=20, limit=500, lineHeight=20,
+                fontSize=16, font="Arial", fontWeight="bold", anchor="middle",
+                align="center", color="#0b8793", offset=20, limit=500, lineHeight=20,
             ).configure_header(
-                titleFontSize=16, titleColor='#0b8793', titleAlign='center',
+                titleFontSize=16, titleColor="#0b8793", titleAlign="center",
             ).properties(padding=padding)
 
         elif chart_type == "Line":
-            chart = alt.Chart(chart_data).mark_line(color='#0066cc', strokeWidth=3).encode(
+            chart = alt.Chart(chart_data).mark_line(color="#0066cc", strokeWidth=3).encode(
                 x=alt.X(x_axis, title=x_axis,
                     axis=alt.Axis(labelAngle=0, titleFontSize=16, labelFontSize=14,
-                                  titleFontWeight='bold', labelFontWeight='bold',
-                                  titleColor='#333333', labelColor='#333333',
-                                  grid=True, gridColor='#e0e0e0', tickSize=6, tickWidth=2)),
+                                  titleFontWeight="bold", labelFontWeight="bold",
+                                  titleColor="#333333", labelColor="#333333",
+                                  grid=True, gridColor="#e0e0e0", tickSize=6, tickWidth=2)),
                 y=alt.Y(y_axis, title=y_axis,
                     axis=alt.Axis(titleFontSize=16, labelFontSize=14,
-                                  titleFontWeight='bold', labelFontWeight='bold',
-                                  titleColor='#333333', labelColor='#333333',
-                                  grid=True, gridColor='#e0e0e0', tickSize=6, tickWidth=2)),
-            ).properties(
-                title=title_config, width=fixed_width, height=fixed_height,
+                                  titleFontWeight="bold", labelFontWeight="bold",
+                                  titleColor="#333333", labelColor="#333333",
+                                  grid=True, gridColor="#e0e0e0", tickSize=6, tickWidth=2)),
+            ).properties(title=title_config, width=fixed_width, height=fixed_height,
             ).configure_view(
-                strokeWidth=1, stroke='#cccccc',
+                strokeWidth=1, stroke="#cccccc",
                 continuousHeight=fixed_height + padding["top"] + padding["bottom"],
-                continuousWidth=fixed_width  + padding["left"] + padding["right"],
+                continuousWidth=fixed_width + padding["left"] + padding["right"],
             ).configure_axis(
-                grid=True, gridColor='#e6e6e6',
-                domainColor='#666666', tickColor='#666666',
-                domainWidth=2, tickWidth=2,
+                grid=True, gridColor="#e6e6e6", domainColor="#666666",
+                tickColor="#666666", domainWidth=2, tickWidth=2,
             ).configure_title(
-                fontSize=16, font='Arial', fontWeight='bold', anchor='middle',
-                color='#0b8793', offset=20, limit=500, lineHeight=20,
-            ).configure_header(
-                titleFontSize=16, titleColor='#0b8793',
+                fontSize=16, font="Arial", fontWeight="bold", anchor="middle",
+                color="#0b8793", offset=20, limit=500, lineHeight=20,
+            ).configure_header(titleFontSize=16, titleColor="#0b8793",
             ).properties(padding=padding)
 
             if show_values:
                 try:
-                    points = alt.Chart(chart_data).mark_circle(
-                        size=80, color='#0066cc', opacity=1,
-                    ).encode(
+                    points = alt.Chart(chart_data).mark_circle(size=80, color="#0066cc", opacity=1).encode(
                         x=alt.X(x_axis), y=alt.Y(y_axis),
-                        tooltip=[x_axis, alt.Tooltip(y_axis, format=',d')],
+                        tooltip=[x_axis, alt.Tooltip(y_axis, format=",d")],
                     )
-
-                    chart_data_copy = chart_data.copy()
-                    chart_data_copy['value_for_display'] = chart_data_copy[y_axis].fillna(0).replace([float('inf'), -float('inf')], 0)
-                    min_value = chart_data_copy['value_for_display'].min()
-                    if min_value > 0:
-                        chart_data_copy['display_value'] = ((chart_data_copy['value_for_display'] - min_value) / min_value * 100).round(0).astype(int).clip(lower=0)
-                        chart_data_copy.loc[chart_data_copy['value_for_display'] == min_value, 'display_value'] = 0
-                        chart_data_copy['display_text'] = chart_data_copy['display_value'].astype(str)
+                    d = chart_data.copy()
+                    d["_v"] = d[y_axis].fillna(0).replace([float("inf"), -float("inf")], 0)
+                    min_v = d["_v"].min()
+                    if min_v > 0:
+                        d["_txt"] = ((d["_v"] - min_v) / min_v * 100).round(0).clip(lower=0).astype(int).astype(str)
+                        d.loc[d["_v"] == min_v, "_txt"] = "0"
                     else:
-                        chart_data_copy['display_text'] = chart_data_copy['value_for_display'].astype(int).astype(str)
-
-                    text = alt.Chart(chart_data_copy).mark_text(
-                        align='center', baseline='bottom', dy=-10, fontSize=14,
-                        fontWeight='bold', stroke='white', strokeWidth=0.5, strokeOpacity=0.8,
-                    ).encode(
-                        x=alt.X(x_axis), y=alt.Y(y_axis),
-                        text='display_text:N', color=alt.value('#000000'),
-                    )
-
+                        d["_txt"] = d["_v"].astype(int).astype(str)
+                    text = alt.Chart(d).mark_text(
+                        align="center", baseline="bottom", dy=-10, fontSize=14,
+                        fontWeight="bold", stroke="white", strokeWidth=0.5, strokeOpacity=0.8,
+                    ).encode(x=alt.X(x_axis), y=alt.Y(y_axis), text="_txt:N", color=alt.value("#000000"))
                     chart = alt.layer(chart, points, text).properties(
                         title=title_config, width=fixed_width, height=fixed_height,
-                    ).configure_view(
-                        strokeWidth=1, stroke='#cccccc',
-                    ).configure_axis(
-                        grid=True, gridColor='#e6e6e6',
-                        domainColor='#666666', tickColor='#666666',
-                    ).configure_title(
-                        fontSize=16, font='Arial', fontWeight='bold',
-                        anchor='middle', color='#0b8793',
-                    )
+                    ).configure_view(strokeWidth=1, stroke="#cccccc",
+                    ).configure_axis(grid=True, gridColor="#e6e6e6", domainColor="#666666", tickColor="#666666",
+                    ).configure_title(fontSize=16, font="Arial", fontWeight="bold", anchor="middle", color="#0b8793")
                 except Exception as e:
-                    st.warning(f"Could not display values on line chart: {str(e)}")
+                    st.warning(f"Could not display values on line chart: {e}")
 
         return chart
 
     # ── PDF creation ───────────────────────────────────────────────────────────
     LOGO_PATH = "images/iesa_green.png"
 
-    if "user_actions" not in st.session_state:
-        st.session_state.user_actions = []
-    if "chart_paths" not in st.session_state:
-        st.session_state.chart_paths = []
-
-    def add_chart_path(chart_path):
-        if chart_path not in st.session_state.chart_paths:
-            st.session_state.chart_paths.append(chart_path)
-
     def create_pdf(chart_paths=None, user_actions=None):
         try:
-            # ── Fetch annual_electricity_data via Supabase REST ────────────────
-            url = f"{SUPABASE_URL.rstrip('/')}/rest/v1/annual_electricity_data"
-            headers = {
-                **_supabase_headers(),
-                "Range-Unit": "items",
-                "Range": "0-",
-                "Prefer": "count=none",
-            }
+            url = f"{SUPABASE_URL}/rest/v1/annual_electricity_data"
+            headers = {**_supabase_headers(), "Range-Unit": "items", "Range": "0-", "Prefer": "count=none"}
             resp = requests.get(url, headers=headers, params={"select": "*"}, timeout=20)
             resp.raise_for_status()
-            rows = resp.json()
-            electricity_data = pd.DataFrame(rows)
+            electricity_data = pd.DataFrame(resp.json())
             column_names = electricity_data.columns.tolist()
-
             chart_folder = "chart_images"
             os.makedirs(chart_folder, exist_ok=True)
             real_chart_paths = []
-
-            year_column  = column_names[0]
+            year_column = column_names[0]
             electricity_data = electricity_data.sort_values(by=year_column)
-
             bar_colors  = ["#73C8A9", "#0b8793"]
             line_colors = ["#2F80ED", "#F06C00"]
-
-            if 'Installed Capacity (MW)' in column_names:
-                cap_chart = alt.Chart(electricity_data).mark_bar().encode(
-                    x=alt.X(year_column, axis=alt.Axis(labelAngle=-45)),
-                    y=alt.Y('Installed Capacity (MW)'),
-                    color=alt.value(bar_colors[0]),
-                    tooltip=[year_column, 'Installed Capacity (MW)'],
-                ).properties(title="Installed Capacity (MW) by Year", width=500, height=350).configure_title(
-                    fontSize=16, font='Arial', fontWeight='bold', color='#0b8793')
-                p = os.path.join(chart_folder, "capacity_chart.png")
-                cap_chart.save(p)
+            chart_defs = [
+                ("Installed Capacity (MW)", "bar",  bar_colors[0],  "capacity_chart.png"),
+                ("Generation (GWh)",        "line", line_colors[0], "generation_chart.png"),
+                ("Consumption (GWh)",       "bar",  bar_colors[1],  "consumption_chart.png"),
+                ("Imports (GWh)",           "line", line_colors[1], "imports_chart.png"),
+            ]
+            for col, kind, color, fname in chart_defs:
+                if col not in column_names:
+                    continue
+                enc = dict(x=alt.X(year_column, axis=alt.Axis(labelAngle=-45)), y=alt.Y(col), tooltip=[year_column, col])
+                c_obj = (alt.Chart(electricity_data).mark_bar().encode(**enc, color=alt.value(color))
+                         if kind == "bar" else
+                         alt.Chart(electricity_data).mark_line(point=True, color=color).encode(**enc))
+                c_obj = c_obj.properties(title=f"{col} by Year", width=500, height=350).configure_title(
+                    fontSize=16, font="Arial", fontWeight="bold", color="#0b8793")
+                p = os.path.join(chart_folder, fname)
+                c_obj.save(p)
                 real_chart_paths.append(p)
-
-            if 'Generation (GWh)' in column_names:
-                gen_chart = alt.Chart(electricity_data).mark_line(point=True, color=line_colors[0]).encode(
-                    x=alt.X(year_column, axis=alt.Axis(labelAngle=-45)),
-                    y=alt.Y('Generation (GWh)'),
-                    tooltip=[year_column, 'Generation (GWh)'],
-                ).properties(title="Generation (GWh) by Year", width=500, height=350).configure_title(
-                    fontSize=16, font='Arial', fontWeight='bold', color='#0b8793')
-                p = os.path.join(chart_folder, "generation_chart.png")
-                gen_chart.save(p)
-                real_chart_paths.append(p)
-
-            if 'Consumption (GWh)' in column_names:
-                con_chart = alt.Chart(electricity_data).mark_bar().encode(
-                    x=alt.X(year_column, axis=alt.Axis(labelAngle=-45)),
-                    y=alt.Y('Consumption (GWh)'),
-                    color=alt.value(bar_colors[1]),
-                    tooltip=[year_column, 'Consumption (GWh)'],
-                ).properties(title="Consumption (GWh) by Year", width=500, height=350).configure_title(
-                    fontSize=16, font='Arial', fontWeight='bold', color='#0b8793')
-                p = os.path.join(chart_folder, "consumption_chart.png")
-                con_chart.save(p)
-                real_chart_paths.append(p)
-
-            if 'Imports (GWh)' in column_names:
-                imp_chart = alt.Chart(electricity_data).mark_line(point=True, color=line_colors[1]).encode(
-                    x=alt.X(year_column, axis=alt.Axis(labelAngle=-45)),
-                    y=alt.Y('Imports (GWh)'),
-                    tooltip=[year_column, 'Imports (GWh)'],
-                ).properties(title="Imports (GWh) by Year", width=500, height=350).configure_title(
-                    fontSize=16, font='Arial', fontWeight='bold', color='#0b8793')
-                p = os.path.join(chart_folder, "imports_chart.png")
-                imp_chart.save(p)
-                real_chart_paths.append(p)
-
             chart_paths = real_chart_paths
         except Exception as e:
             print(f"Error creating charts: {e}")
 
-        buffer = io.BytesIO()
-        c = canvas.Canvas(buffer, pagesize=A4)
-        width, height = A4
-
-        header_y = height - 45
-        c.setStrokeColor(colors.HexColor("#F06C00"))
-        c.setLineWidth(2)
-        c.line(20, header_y, width - 20, header_y)
-
+        buf = io.BytesIO()
+        c = canvas.Canvas(buf, pagesize=A4)
+        w, h = A4
+        c.setStrokeColor(colors.HexColor("#F06C00")); c.setLineWidth(2)
+        c.line(20, h - 45, w - 20, h - 45)
         if os.path.exists(LOGO_PATH):
-            logo = ImageReader(LOGO_PATH)
-            c.drawImage(logo, width - 80, height - 42, width=60, height=24, mask='auto')
-
-        c.setFillColor(colors.HexColor("#504B38"))
-        c.setFont("Helvetica-Bold", 22)
-        title_text = "Data Planner Report"
-        c.drawString((width - c.stringWidth(title_text, "Helvetica-Bold", 22)) / 2, height - 100, title_text)
-
-        c.setFillColor(colors.black)
-        c.setFont("Helvetica", 11)
-        description = "This report presents electricity data trends from 2002 to 2019."
-        desc_width = c.stringWidth(description, "Helvetica", 11)
-        c.drawString((width - desc_width) / 2, height - 130, description)
-
-        c.setStrokeColor(colors.HexColor("#0b8793"))
-        c.setLineWidth(1)
-        c.line(60, height - 160, width - 60, height - 160)
-
-        chart_y = height - 190
-        c.setFillColor(colors.HexColor("#0b8793"))
-        c.setFont("Helvetica-Bold", 16)
-        c.drawString(60, chart_y, "Electricity Data Visualization")
-
-        c.setFillColor(colors.black)
-        c.setFont("Helvetica", 10)
-        chart_desc = "Trends in Pakistan's electricity sector (2002-2019)"
-        chart_desc_width = c.stringWidth(chart_desc, "Helvetica", 10)
-        c.drawString((width - chart_desc_width) / 2, chart_y - 25, chart_desc)
-
-        chart_width  = 230
-        chart_height = 160
-
-        if chart_paths and len(chart_paths) > 0:
-            charts_top_y    = chart_y - 60
-            chart1_x        = 60
-            chart2_x        = chart1_x + chart_width + 30
-            charts_bottom_y = charts_top_y - chart_height - 50
-
-            chart_titles = [
-                "Installed Capacity Growth",
-                "Electricity Generation Trend",
-                "Consumption Pattern",
-                "Import Requirements",
-            ]
-            chart_descriptions = [
-                "17,787 MW to 35,114 MW",
-                "75,682 GWh to 128,532 GWh",
-                "51,655 GWh to 109,461 GWh",
-                "73 GWh to 556 GWh",
-            ]
-
-            for i, chart_path in enumerate(chart_paths[:4]):
-                if os.path.exists(chart_path):
-                    row   = i // 2
-                    col   = i  % 2
-                    x_pos = chart1_x if col == 0 else chart2_x
-                    y_pos = charts_top_y if row == 0 else charts_bottom_y
-
-                    c.setStrokeColor(colors.HexColor("#0b8793"))
-                    c.roundRect(x_pos - 5, y_pos - chart_height - 5, chart_width + 10, chart_height + 10, 5, stroke=1, fill=0)
-                    c.drawImage(chart_path, x_pos, y_pos - chart_height, width=chart_width, height=chart_height, mask='auto')
-
-                    if i < len(chart_titles):
-                        c.setFillColor(colors.HexColor("#0b8793"))
-                        c.setFont("Helvetica-Bold", 10)
-                        t = chart_titles[i]
-                        tw = c.stringWidth(t, "Helvetica-Bold", 10)
-                        c.drawString(x_pos + (chart_width - tw) / 2, y_pos - chart_height - 18, t)
-
-                        c.setFillColor(colors.black)
-                        c.setFont("Helvetica", 9)
-                        d  = chart_descriptions[i]
-                        dw = c.stringWidth(d, "Helvetica", 9)
-                        c.drawString(x_pos + (chart_width - dw) / 2, y_pos - chart_height - 35, d)
-
-            insight_y = charts_bottom_y - chart_height - 70
-            c.setStrokeColor(colors.HexColor("#0b8793"))
-            c.setLineWidth(1)
-            c.line(60, insight_y + 15, width - 60, insight_y + 15)
-
-            c.setFillColor(colors.HexColor("#0b8793"))
-            c.setFont("Helvetica-Bold", 14)
-            insight_title = "Key Insights:"
-            itw = c.stringWidth(insight_title, "Helvetica-Bold", 14)
-            c.drawString((width - itw) / 2, insight_y, insight_title)
-
-            c.setFillColor(colors.black)
-            c.setFont("Helvetica", 10)
-            summary_text = (
-                "Pakistan's electricity sector doubled capacity while increasing generation by 70% and "
-                "consumption by 112%. Rising imports indicate growing demand challenges despite capacity expansion."
-            )
-            text_obj = c.beginText(60, insight_y - 25)
-            text_obj.setFont("Helvetica", 10)
-            for line in wrap(summary_text, width=75):
-                text_obj.textLine(line)
-            c.drawText(text_obj)
+            c.drawImage(ImageReader(LOGO_PATH), w - 80, h - 42, width=60, height=24, mask="auto")
+        c.setFillColor(colors.HexColor("#504B38")); c.setFont("Helvetica-Bold", 22)
+        tt = "Data Planner Report"
+        c.drawString((w - c.stringWidth(tt, "Helvetica-Bold", 22)) / 2, h - 100, tt)
+        c.setFillColor(colors.black); c.setFont("Helvetica", 11)
+        ds = "This report presents electricity data trends from 2002 to 2019."
+        c.drawString((w - c.stringWidth(ds, "Helvetica", 11)) / 2, h - 130, ds)
+        c.setStrokeColor(colors.HexColor("#0b8793")); c.setLineWidth(1)
+        c.line(60, h - 160, w - 60, h - 160)
+        cy = h - 190
+        c.setFillColor(colors.HexColor("#0b8793")); c.setFont("Helvetica-Bold", 16)
+        c.drawString(60, cy, "Electricity Data Visualization")
+        c.setFillColor(colors.black); c.setFont("Helvetica", 10)
+        sub = "Trends in Pakistan's electricity sector (2002-2019)"
+        c.drawString((w - c.stringWidth(sub, "Helvetica", 10)) / 2, cy - 25, sub)
+        cw2, ch2 = 230, 160
+        if chart_paths:
+            ty = cy - 60; x1, x2 = 60, 60 + cw2 + 30; by = ty - ch2 - 50
+            titles = ["Installed Capacity Growth", "Electricity Generation Trend", "Consumption Pattern", "Import Requirements"]
+            descs  = ["17,787 MW to 35,114 MW", "75,682 GWh to 128,532 GWh", "51,655 GWh to 109,461 GWh", "73 GWh to 556 GWh"]
+            for i, cp in enumerate(chart_paths[:4]):
+                if not os.path.exists(cp): continue
+                row2, col2 = divmod(i, 2)
+                xp = x1 if col2 == 0 else x2; yp = ty if row2 == 0 else by
+                c.setStrokeColor(colors.HexColor("#0b8793"))
+                c.roundRect(xp - 5, yp - ch2 - 5, cw2 + 10, ch2 + 10, 5, stroke=1, fill=0)
+                c.drawImage(cp, xp, yp - ch2, width=cw2, height=ch2, mask="auto")
+                if i < len(titles):
+                    c.setFillColor(colors.HexColor("#0b8793")); c.setFont("Helvetica-Bold", 10)
+                    tw = c.stringWidth(titles[i], "Helvetica-Bold", 10)
+                    c.drawString(xp + (cw2 - tw) / 2, yp - ch2 - 18, titles[i])
+                    c.setFillColor(colors.black); c.setFont("Helvetica", 9)
+                    dw = c.stringWidth(descs[i], "Helvetica", 9)
+                    c.drawString(xp + (cw2 - dw) / 2, yp - ch2 - 35, descs[i])
+            iy = by - ch2 - 70
+            c.setStrokeColor(colors.HexColor("#0b8793")); c.line(60, iy + 15, w - 60, iy + 15)
+            c.setFillColor(colors.HexColor("#0b8793")); c.setFont("Helvetica-Bold", 14)
+            it = "Key Insights:"
+            c.drawString((w - c.stringWidth(it, "Helvetica-Bold", 14)) / 2, iy, it)
+            c.setFillColor(colors.black); c.setFont("Helvetica", 10)
+            summary = ("Pakistan's electricity sector doubled capacity while increasing generation by 70% and "
+                       "consumption by 112%. Rising imports indicate growing demand challenges despite capacity expansion.")
+            to = c.beginText(60, iy - 25); to.setFont("Helvetica", 10)
+            for line in wrap(summary, width=75): to.textLine(line)
+            c.drawText(to)
         else:
-            c.setFillColor(colors.red)
-            c.setFont("Helvetica", 12)
-            c.drawString(60, chart_y - 50, "Error: Unable to generate charts from electricity data.")
-
-        c.setStrokeColor(colors.HexColor("#4389a2"))
-        c.setLineWidth(2)
-        c.line(20, 30, width - 20, 30)
-        c.setFont("Helvetica", 8)
-        c.setFillColor(colors.gray)
+            c.setFillColor(colors.red); c.setFont("Helvetica", 12)
+            c.drawString(60, cy - 50, "Error: Unable to generate charts from electricity data.")
+        c.setStrokeColor(colors.HexColor("#4389a2")); c.setLineWidth(2)
+        c.line(20, 30, w - 20, 30)
+        c.setFont("Helvetica", 8); c.setFillColor(colors.gray)
         c.drawString(40, 15, "© 2025 IESA. All rights reserved.")
-        c.drawString(width - 80, 15, "Page 1")
+        c.drawString(w - 80, 15, "Page 1")
+        c.save(); buf.seek(0)
+        return buf
 
-        c.save()
-        buffer.seek(0)
-        return buffer
-
-    # ── Helpers ────────────────────────────────────────────────────────────────
     def format_large_number(num):
         if num >= 1_000_000:
             return f"{locale.format_string('%d', num // 1_000_000)} million"
         elif num >= 1_000:
             return f"{locale.format_string('%d', num // 1_000)} thousand"
-        return locale.format_string('%d', num)
+        return locale.format_string("%d", num)
 
-    # ── Streamlit UI ───────────────────────────────────────────────────────────
+    # ── CSS ────────────────────────────────────────────────────────────────────
     image_path = "images/iesa_white.svg"
 
     st.markdown("""
         <style>
         header {
-            border-bottom: 3px solid  #136a8a !important;
+            border-bottom: 3px solid #136a8a !important;
             margin-bottom: 0 !important;
             position: relative !important;
             z-index: 99 !important;
@@ -2439,23 +2265,89 @@ def load_data_planner(logger):
             box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             z-index: 98;
         }
-        div[data-testid="stHorizontalBlock"] > div .stButton button {
-            background-color: #0b8793;
-            color: white !important;
-            border: 1px solid #4AC29A;
-            border-radius: 5px;
-            padding: 6px 12px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            width: auto !important;
-            min-width: 120px;
-            max-width: 150px;
-            margin: 25px auto 20px;
-            font-size: 14px;
-            white-space: nowrap;
-            display: block;
+        #MainMenu, footer, header { visibility: hidden; }
+        .block-container { padding-top: 0.1rem !important; }
+        .main .block-container { padding-top: 0.5rem !important; margin-top: 0 !important; }
+
+        /* ── Sidebar text & inputs ── */
+        [data-testid="stSidebar"] h2 {
+            font-size: 22px !important;
+            margin-top: 25px !important;
+            margin-bottom: 15px !important;
+            padding-bottom: 5px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] label {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        [data-testid="stSidebar"] .stSelectbox > div {
+            background-color: rgba(255,255,255,0.1) !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            border-radius: 5px;
+            color: white !important;
+            margin-bottom: 15px;
+        }
+        [data-testid="stSidebar"] .stSelectbox > div:hover {
+            border: 1px solid rgba(255,255,255,0.4) !important;
+        }
+
+        /* ── Sidebar regular buttons ── */
+        [data-testid="stSidebar"] .stButton button {
+            width: 100%;
+            background-color: #0b8793 !important;
+            color: white !important;
+            border: 1px solid #4AC29A !important;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        [data-testid="stSidebar"] .stButton button:hover {
+            background-color: #4AC29A !important;
+            color: white !important;
+            box-shadow: 0 3px 7px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+
+        /* ── Download button — explicit fix ──────────────────────────────────
+           st.download_button renders as [data-testid="stDownloadButton"].
+           Without this rule the background inherits white from Streamlit's
+           default theme and only shows colour on hover.                      */
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] button,
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] > button {
+            width: 100% !important;
+            background-color: #0b8793 !important;
+            color: white !important;
+            border: 1px solid #4AC29A !important;
+            border-radius: 5px !important;
+            font-size: 0.9em !important;
+            font-weight: bold !important;
+            padding: 8px 20px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin-bottom: 10px !important;
+            letter-spacing: 0.3px !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] button:hover,
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] > button:hover {
+            background-color: #4AC29A !important;
+            color: white !important;
+            box-shadow: 0 3px 7px rgba(0,0,0,0.15) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* ── Navigation ── */
         [data-baseweb="tab-list"] {
             border-top: none !important;
             border-left: none !important;
@@ -2464,7 +2356,7 @@ def load_data_planner(logger):
             background-color: transparent !important;
         }
         .nav-link-selected::after {
-            content: '' !important;
+            content: "" !important;
             position: absolute !important;
             bottom: -3px !important;
             left: 10% !important;
@@ -2495,43 +2387,8 @@ def load_data_planner(logger):
             min-width: 60px;
             max-width: 80px;
         }
-        [data-testid="stSidebar"] h2 {
-            font-size: 22px !important;
-            margin-top: 25px !important;
-            margin-bottom: 15px !important;
-            padding-bottom: 5px;
-            border-bottom: 2px solid rgba(255,255,255,0.3);
-        }
-        #MainMenu, footer, header { visibility: hidden; }
-        .block-container { padding-top: 0.1rem !important; }
-        .main .block-container { padding-top: 0.5rem !important; margin-top: 0 !important; }
-        [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
-            color: rgba(255,255,255,0.9) !important;
-            font-weight: 500;
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-        [data-testid="stSidebar"] .stSelectbox > div {
-            background-color: rgba(255,255,255,0.1) !important;
-            border: 1px solid rgba(255,255,255,0.2) !important;
-            border-radius: 5px;
-            color: white !important;
-            margin-bottom: 15px;
-        }
-        a { text-decoration: none; color: #0F403F !important; }
-        [data-testid="stSidebar"] .stButton button {
-            width: 100%;
-            background-color: #0b8793;
-            color: white !important;
-            border: 1px solid #4AC29A;
-            border-radius: 5px;
-            font-size: 0.9em;
-            font-weight: bold;
-            padding: 8px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 10px;
-        }
+
+        /* ── Metric buttons ── */
         .sum-button, .count-button, .total-button, .unique-button {
             padding: 8px 15px;
             border-radius: 12px;
@@ -2550,10 +2407,13 @@ def load_data_planner(logger):
         .count-button  { background: linear-gradient(135deg, #FF6F61, #DE4313); }
         .total-button  { background: linear-gradient(135deg, #56CCF2, #2F80ED); }
         .unique-button { background: linear-gradient(135deg, #A5D6A7, #66BB6A); }
-        .sum-button:hover, .count-button:hover, .total-button:hover, .unique-button:hover {
+        .sum-button:hover, .count-button:hover,
+        .total-button:hover, .unique-button:hover {
             transform: translateY(-5px);
             box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
         }
+
+        /* ── Chart wrappers ── */
         .marks {
             border-radius: 15px;
             border: 1px solid #0b8793;
@@ -2575,21 +2435,25 @@ def load_data_planner(logger):
             flex: 0 0 calc(50% - 10px) !important;
             max-width: calc(50% - 10px) !important;
         }
+        a { text-decoration: none; color: #0F403F !important; }
+        a:hover { color: #0F403F !important; text-decoration: none; }
         </style>
     """, unsafe_allow_html=True)
 
-    # Session state init
-    if "charts"  not in st.session_state: st.session_state["charts"]  = []
-    if "metrics" not in st.session_state: st.session_state["metrics"] = []
-    if "selected_table" not in st.session_state: st.session_state["selected_table"] = None
-
+    # ── Sidebar UI ─────────────────────────────────────────────────────────────
     st.markdown("<div style='margin-top: 60px;'></div>", unsafe_allow_html=True)
-
     st.sidebar.image(image_path, width=200)
     st.sidebar.markdown("<h2>Data Planner Dashboard</h2>", unsafe_allow_html=True)
     st.sidebar.markdown("<h3>Table and Chart Selection</h3>", unsafe_allow_html=True)
 
-    tables = ["annual_electricity_data","electricity_consumption_by_sector_gwh","energy_supply_and_consumption_analysis","final_energy_consumption_by_source_toe","natural_gas_production_and_consumption","primary_energy_supplies_by_source_toe","province_wise_electricity_consumption_gwh","province_wise_energy_consumption","provincial_energy_distribution_and_transmission_losses","scenario_definitions","sector_wise_energy_consumption","total_imports_lng","total_proved_reserves"]
+    tables = [
+        "annual_electricity_data", "electricity_consumption_by_sector_gwh",
+        "energy_supply_and_consumption_analysis", "final_energy_consumption_by_source_toe",
+        "natural_gas_production_and_consumption", "primary_energy_supplies_by_source_toe",
+        "province_wise_electricity_consumption_gwh", "province_wise_energy_consumption",
+        "provincial_energy_distribution_and_transmission_losses", "scenario_definitions",
+        "sector_wise_energy_consumption", "total_imports_lng", "total_proved_reserves",
+    ]
     selected_table = st.sidebar.selectbox("Select a table", tables)
 
     if selected_table:
@@ -2597,23 +2461,22 @@ def load_data_planner(logger):
         columns = data.columns.tolist()
 
         st.sidebar.markdown("### Chart Options")
-        chart_type = st.sidebar.selectbox("Select Chart Type", ["Bar", "Line"])
-        x_axis     = st.sidebar.selectbox("Select x-axis", columns, key="chart_x_axis")
-        y_axis     = st.sidebar.selectbox("Select y-axis", columns, key="chart_y_axis")
-        show_values = st.sidebar.checkbox("Show values on chart", value=False, key="show_values")
+        chart_type    = st.sidebar.selectbox("Select Chart Type", ["Bar", "Line"])
+        x_axis        = st.sidebar.selectbox("Select x-axis", columns, key="chart_x_axis")
+        y_axis        = st.sidebar.selectbox("Select y-axis", columns, key="chart_y_axis")
+        show_values   = st.sidebar.checkbox("Show values on chart", value=False, key="show_values")
         add_chart_btn = st.sidebar.button("Add Chart", key="add_chart_button")
 
         st.sidebar.markdown("### Metric Options")
-        metric_column = st.sidebar.selectbox("Select Column for Metric", columns, key="metric_column")
-        metric_type   = st.sidebar.selectbox("Select Metric Type", ["Sum", "Count", "Average", "Unique"])
+        metric_column  = st.sidebar.selectbox("Select Column for Metric", columns, key="metric_column")
+        metric_type    = st.sidebar.selectbox("Select Metric Type", ["Sum", "Count", "Average", "Unique"])
         add_metric_btn = st.sidebar.button("Add Metric", key="add_metric_button")
-
-        reset_button = st.sidebar.button("Reset Dashboard")
+        reset_button   = st.sidebar.button("Reset Dashboard")
 
         if add_chart_btn:
             st.session_state["charts"].append((selected_table, chart_type, x_axis, y_axis, show_values))
             hide_sidebar()
-            logger.info(f"Chart added: Table={selected_table}, Type={chart_type}, X={x_axis}, Y={y_axis}, ShowValues={show_values}")
+            logger.info(f"Chart added: Table={selected_table}, Type={chart_type}, X={x_axis}, Y={y_axis}")
             st.toast(f"Chart added: {chart_type} of {y_axis} vs {x_axis}", icon="📊")
 
         if add_metric_btn:
@@ -2629,30 +2492,24 @@ def load_data_planner(logger):
             logger.info("Dashboard reset by user")
             st.toast("Dashboard reset!", icon="🔄")
 
-    # Display metrics
+    # ── Metrics ────────────────────────────────────────────────────────────────
     if st.session_state["metrics"]:
-        metric_buttons_html = '<div class="metric-buttons">'
-        for metric in st.session_state["metrics"]:
-            table, column, metric_type = metric
-            metric_data = fetch_table_data(table)
-            if metric_type == "Sum":
-                result = int(metric_data[column].sum());  button_class = "sum-button"
-            elif metric_type == "Count":
-                result = int(metric_data[column].count()); button_class = "count-button"
-            elif metric_type == "Average":
-                result = int(metric_data[column].mean()); button_class = "total-button"
-            elif metric_type == "Unique":
-                result = int(metric_data[column].nunique()); button_class = "unique-button"
-            formatted_result = format_large_number(result)
-            metric_buttons_html += f'<button class="{button_class}">{column}: {formatted_result}</button>'
-        metric_buttons_html += '</div>'
-        st.markdown(metric_buttons_html, unsafe_allow_html=True)
+        html = '<div class="metric-buttons">'
+        for table, column, mtype in st.session_state["metrics"]:
+            md = fetch_table_data(table)
+            if mtype == "Sum":     result, cls = int(md[column].sum()),    "sum-button"
+            elif mtype == "Count": result, cls = int(md[column].count()),  "count-button"
+            elif mtype == "Average": result, cls = int(md[column].mean()), "total-button"
+            else:                  result, cls = int(md[column].nunique()), "unique-button"
+            html += f'<button class="{cls}">{column}: {format_large_number(result)}</button>'
+        html += "</div>"
+        st.markdown(html, unsafe_allow_html=True)
 
-    color_schemes = ['blues', 'tealblues', 'teals', 'greens', 'browns', 'greys',
-                     'purples', 'warmgreys', 'reds', 'oranges']
+    color_schemes = ["blues", "tealblues", "teals", "greens", "browns", "greys",
+                     "purples", "warmgreys", "reds", "oranges"]
     selected_color_scheme = st.sidebar.selectbox("Choose Color Scheme", color_schemes)
 
-    # Display charts
+    # ── Charts ─────────────────────────────────────────────────────────────────
     if st.session_state["charts"]:
         num_cols = 2
         cols = st.columns(num_cols)
@@ -2661,30 +2518,34 @@ def load_data_planner(logger):
             st.session_state.chart_paths = []
 
         for idx, chart_info in enumerate(st.session_state["charts"]):
-            table, chart_type, x_axis, y_axis = chart_info if len(chart_info) == 4 else chart_info[:4]
-            show_values = chart_info[4] if len(chart_info) > 4 else False
-            chart_data  = fetch_table_data(table)
-            chart = create_chart(table, chart_type, x_axis, y_axis, show_values, chart_data, selected_color_scheme)
-
+            table, ct, xa, ya = chart_info[:4]
+            sv = chart_info[4] if len(chart_info) > 4 else False
+            cd = fetch_table_data(table)
+            ch = create_chart(table, ct, xa, ya, sv, cd, selected_color_scheme)
             chart_folder = "chart_images"
             os.makedirs(chart_folder, exist_ok=True)
-            chart_path = os.path.join(chart_folder, f"chart_{idx + 1}.png")
-            chart.save(chart_path)
-            st.session_state.chart_paths.append(chart_path)
+            cp = os.path.join(chart_folder, f"chart_{idx + 1}.png")
+            ch.save(cp)
+            st.session_state.chart_paths.append(cp)
 
         for idx, chart_info in enumerate(st.session_state["charts"]):
-            col_idx = idx % num_cols
-            table, chart_type, x_axis, y_axis = chart_info if len(chart_info) == 4 else chart_info[:4]
-            show_values = chart_info[4] if len(chart_info) > 4 else False
-            chart_data  = fetch_table_data(table)
-            chart = create_chart(table, chart_type, x_axis, y_axis, show_values, chart_data, selected_color_scheme)
-            with cols[col_idx]:
+            table, ct, xa, ya = chart_info[:4]
+            sv = chart_info[4] if len(chart_info) > 4 else False
+            cd = fetch_table_data(table)
+            ch = create_chart(table, ct, xa, ya, sv, cd, selected_color_scheme)
+            with cols[idx % num_cols]:
                 st.markdown('<div style="margin-top: -420px;"></div>', unsafe_allow_html=True)
-                st.altair_chart(chart, use_container_width=False)
+                st.altair_chart(ch, use_container_width=False)
 
+    # ── PDF download ───────────────────────────────────────────────────────────
     if selected_table and st.session_state.chart_paths:
         pdf_buffer = create_pdf(st.session_state.chart_paths, st.session_state.user_actions)
-        st.sidebar.download_button("Download Report", pdf_buffer, "IESA_Report.pdf", "application/pdf")
+        st.sidebar.download_button(
+            label="⬇ Download Report",
+            data=pdf_buffer,
+            file_name="IESA_Report.pdf",
+            mime="application/pdf",
+        )
         logger.info(f"PDF report generated with {len(st.session_state.chart_paths)} charts")
         st.toast("PDF report ready for download!", icon="📄")
 
