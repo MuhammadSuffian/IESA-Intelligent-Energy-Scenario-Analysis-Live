@@ -1102,7 +1102,7 @@ def load_personalized_recommendations(logger):
         [data-testid="stSidebar"] {
             background: linear-gradient(135deg, #73C8A9, #0b8793);
             color: white;
-            
+            margin-top: -10px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             z-index: 98;
             border-right: none;
@@ -1191,7 +1191,7 @@ def load_personalized_recommendations(logger):
             border-radius: 5px;
         }
         [data-testid="stSidebar"] > div:first-child {
-    padding-top: 20px !important;
+    padding-top: 40px !important;
 }
         [data-testid="stBaseButton-secondary"]:hover {
             background-color: #0b8793;
