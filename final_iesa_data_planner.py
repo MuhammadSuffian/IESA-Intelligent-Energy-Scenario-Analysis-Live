@@ -2265,9 +2265,7 @@ def load_data_planner(logger):
             box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             z-index: 98;
         }
-        #MainMenu, footer, header { visibility: hidden; }
-        .block-container { padding-top: 0.1rem !important; }
-        .main .block-container { padding-top: 0.5rem !important; margin-top: 0 !important; }
+
 
         /* ── Sidebar text & inputs ── */
         [data-testid="stSidebar"] h2 {
