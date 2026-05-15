@@ -1385,7 +1385,7 @@ def load_personalized_recommendations(logger):
     # ── Sidebar ────────────────────────────────────────────────────────────────
     st.sidebar.image("images/iesa_white.svg", width=200)
     # st.sidebar.title("Wisdom Mining")
-    st.sidebar.markdown("<p style='color:white; font-size:20px; font-weight:600; margin:4px 0 10px 0; letter-spacing:0.3px;'>Wisdom Mining</p>", unsafe_allow_html=True)
+    st.sidebar.markdown("<p style='color:white; font-size:22px; font-weight:600; margin:4px 0 10px 0; letter-spacing:0.3px;'>Wisdom Mining</p>", unsafe_allow_html=True)
     st.sidebar.markdown("<h1>IESA Assistant</h1>", unsafe_allow_html=True)
     st.sidebar.header("Table Selection")
 
