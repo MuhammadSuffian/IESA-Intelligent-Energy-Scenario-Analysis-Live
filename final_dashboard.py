@@ -1062,11 +1062,7 @@ def load_dash(logger):
             background: #329D9C;
         }
         
-        /* Hide default Streamlit elements */
-        .css-18e3th9 {
-            padding-top: 0;
-        }
-        
+
         /* Chart container */
         .chart-container {
             background-color: white;
