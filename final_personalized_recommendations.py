@@ -1105,7 +1105,32 @@ def load_personalized_recommendations(logger):
             margin-top: -10px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             z-index: 98;
-            border-right: none;
+        }
+        [data-testid="stSidebar"] > div:first-child {
+            padding-top: 20px !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] button,
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] > button {
+            width: 100% !important;
+            background-color: #0b8793 !important;
+            color: white !important;
+            border: 1px solid #4AC29A !important;
+            border-radius: 5px !important;
+            font-size: 0.9em !important;
+            font-weight: bold !important;
+            padding: 8px 20px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin-bottom: 10px !important;
+            letter-spacing: 0.3px !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] button:hover,
+        [data-testid="stSidebar"] [data-testid="stDownloadButton"] > button:hover {
+            background-color: #4AC29A !important;
+            color: white !important;
+            box-shadow: 0 3px 7px rgba(0,0,0,0.15) !important;
+            transform: translateY(-1px) !important;
         }
         div[data-testid="stHorizontalBlock"] > div .stButton button {
             background-color: #0b8793;
@@ -1190,9 +1215,6 @@ def load_personalized_recommendations(logger):
             border: 1px solid #4AC29A;
             border-radius: 5px;
         }
-        [data-testid="stSidebar"] > div:first-child {
-    padding-top: 40px !important;
-}
         [data-testid="stBaseButton-secondary"]:hover {
             background-color: #0b8793;
             color: white !important;
