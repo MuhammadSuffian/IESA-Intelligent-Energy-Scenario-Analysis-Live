@@ -1338,7 +1338,7 @@ def load_wisdom_mining(logger):
             return tables
         except Exception as e:
             logger.error(f"Error fetching tables: {e}")
-            st.toast("Error fetching tables!", icon="❌")
+            # st.toast("Error fetching tables!", icon="❌")
             return []
 
     def fetch_data_from_db(table_name: str = "annual_electricity_data") -> pd.DataFrame:
