@@ -1991,7 +1991,7 @@ def load_data_planner(logger):
             return tables
         except Exception as e:
             logger.error(f"Error fetching tables: {e}")
-            st.toast("Error fetching tables!", icon="❌")
+            # st.toast("Error fetching tables!", icon="❌")
             return []
 
     def fetch_table_data(table_name: str) -> pd.DataFrame:
@@ -2011,7 +2011,7 @@ def load_data_planner(logger):
             return data
         except Exception as e:
             logger.error(f"Error fetching data from {table_name}: {e}")
-            st.toast("Error fetching data!", icon="❌")
+            # st.toast("Error fetching data!", icon="❌")
             return pd.DataFrame()
 
     # ── Chart creation ─────────────────────────────────────────────────────────

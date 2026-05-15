@@ -321,7 +321,7 @@ def fetch_table_data(table_name: str) -> pd.DataFrame:
 
     except Exception as e:
         print(f"Error fetching data from {table_name}: {e}")
-        st.toast(f"Error fetching data from {table_name}!", icon="❌")
+        # st.toast(f"Error fetching data from {table_name}!", icon="❌")
         data = pd.DataFrame()
 
     return data

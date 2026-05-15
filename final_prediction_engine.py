@@ -889,7 +889,7 @@ def fetch_table_data(table_name: str) -> pd.DataFrame:
         rows = resp.json()
         return pd.DataFrame(rows) if rows else pd.DataFrame()
     except Exception as e:
-        st.toast(f"Error fetching '{table_name}': {e}", icon="❌")
+        # st.toast(f"Error fetching '{table_name}': {e}", icon="❌")
         return pd.DataFrame()
 
 

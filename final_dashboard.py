@@ -816,7 +816,7 @@ def fetch_table_data(table_name: str) -> pd.DataFrame:
         data = pd.DataFrame(rows)
         return data
     except Exception as e:
-        st.toast(f"Error fetching '{table_name}': {e}", icon="❌")
+        # st.toast(f"Error fetching '{table_name}': {e}", icon="❌")
         return pd.DataFrame()
 
 
@@ -1136,7 +1136,7 @@ def load_dash(logger):
         <h2>Dashboard</h2>
     """,unsafe_allow_html=True)
         # st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
-        st.toast("Hello Suffian there??")
+        # st.toast("Hello Suffian there??")
         # Side navigation menu
         selected = option_menu(
         menu_title="Dashboard Navigation",
