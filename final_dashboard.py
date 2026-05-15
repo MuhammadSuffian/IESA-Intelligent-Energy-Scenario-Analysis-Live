@@ -1189,7 +1189,7 @@ def load_dash(logger):
     if selected == "Dashboard Home":
         # Main header
         st.markdown("<div class='dashboard-header'>", unsafe_allow_html=True)
-        st.title("🌍 Integrated Energy System Analytics Dashboard")
+        st.title("🌍 Integrated Energy Analytics Platform Powered by WisRule Wisdom Mining")
         st.markdown("<p style='font-size: 18px;'>Comprehensive energy analytics for intelligent decision making</p>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
         
