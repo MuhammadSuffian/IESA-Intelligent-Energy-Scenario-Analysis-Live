@@ -1182,6 +1182,7 @@ def load_prediction_engine(logger):
 
     # ── Sidebar ────────────────────────────────────────────────────────────────
     st.sidebar.image(image_path, width=200)
+    st.sidebar.title("Wisdom Mining")
     st.sidebar.markdown("<h2>Prediction Engine</h2>", unsafe_allow_html=True)
 
     tables = fetch_tables()
