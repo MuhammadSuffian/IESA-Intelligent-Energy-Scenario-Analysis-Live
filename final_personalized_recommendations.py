@@ -1190,6 +1190,9 @@ def load_personalized_recommendations(logger):
             border: 1px solid #4AC29A;
             border-radius: 5px;
         }
+        [data-testid="stSidebar"] > div:first-child {
+    padding-top: 20px !important;
+}
         [data-testid="stBaseButton-secondary"]:hover {
             background-color: #0b8793;
             color: white !important;
@@ -1357,6 +1360,7 @@ def load_personalized_recommendations(logger):
 
     # ── Sidebar ────────────────────────────────────────────────────────────────
     st.sidebar.image("images/iesa_white.svg", width=200)
+    st.title("Wisdom Mining")
     st.sidebar.markdown("<h1>IESA Assistant</h1>", unsafe_allow_html=True)
     st.sidebar.header("Table Selection")
 
