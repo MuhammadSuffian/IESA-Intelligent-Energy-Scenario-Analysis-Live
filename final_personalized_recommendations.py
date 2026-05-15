@@ -1107,7 +1107,7 @@ def load_personalized_recommendations(logger):
             z-index: 98;
         }
         [data-testid="stSidebar"] > div:first-child {
-            padding-top: 80px !important;
+            padding-top: 70px !important;
         }
         [data-testid="stSidebar"] .stTitle,
         [data-testid="stSidebar"] h1 {
