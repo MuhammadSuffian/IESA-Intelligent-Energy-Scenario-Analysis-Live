@@ -1307,8 +1307,8 @@ def load_personalized_recommendations(logger):
     except Exception:
         api_key = None
 # TEMPORARY DEBUG — remove after confirming keys are visible
-    with st.expander("🔑 Debug: secrets keys present"):
-        st.write(list(st.secrets.keys()))
+    # with st.expander("🔑 Debug: secrets keys present"):
+    #     st.write(list(st.secrets.keys()))
     # ── Model ──────────────────────────────────────────────────────────────────
     def get_model():
         try:
