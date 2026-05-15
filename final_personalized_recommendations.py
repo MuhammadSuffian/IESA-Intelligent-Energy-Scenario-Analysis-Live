@@ -1356,6 +1356,7 @@ def load_personalized_recommendations(logger):
             return f"API call failed: {repr(e)}"
 
     # ── Sidebar ────────────────────────────────────────────────────────────────
+    st.sidebar.image("images/iesa_white.svg", width=200)
     st.sidebar.markdown("<h1>IESA Assistant</h1>", unsafe_allow_html=True)
     st.sidebar.header("Table Selection")
 
