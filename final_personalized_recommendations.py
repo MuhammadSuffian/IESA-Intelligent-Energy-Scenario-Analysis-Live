@@ -1124,9 +1124,6 @@ def load_personalized_recommendations(logger):
             white-space: nowrap;
             display: block;
         }
-        #MainMenu, footer, header {
-            visibility: hidden;
-        }
         div[data-testid="stHorizontalBlock"] > div .stButton button:hover {
             background-color: #4AC29A;
             transform: translateY(-1px);
