@@ -1109,7 +1109,7 @@ def load_personalized_recommendations(logger):
         [data-testid="stSidebar"] > div:first-child {
             padding-top: 76px !important;
         }
-        [data-testid="stSidebar"] .stTitle,
+        
         [data-testid="stSidebar"] h1 {
             color: white !important;
             font-size: 20px !important;
