@@ -1360,8 +1360,8 @@ def load_personalized_recommendations(logger):
 
     # ── Sidebar ────────────────────────────────────────────────────────────────
     st.sidebar.image("images/iesa_white.svg", width=200)
-    st.title("Wisdom Mining")
-    st.sidebar.markdown("<h1>IESA AssistantWisdom Mining</h1>", unsafe_allow_html=True)
+    st.sidebar.title("Wisdom Mining")
+    st.sidebar.markdown("<h1>IESA Assistant</h1>", unsafe_allow_html=True)
     st.sidebar.header("Table Selection")
 
     tables = ["annual_electricity_data","electricity_consumption_by_sector_gwh","energy_supply_and_consumption_analysis","final_energy_consumption_by_source_toe","natural_gas_production_and_consumption","primary_energy_supplies_by_source_toe","province_wise_electricity_consumption_gwh","province_wise_energy_consumption","provincial_energy_distribution_and_transmission_losses","scenario_definitions","sector_wise_energy_consumption","total_imports_lng","total_proved_reserves"]
