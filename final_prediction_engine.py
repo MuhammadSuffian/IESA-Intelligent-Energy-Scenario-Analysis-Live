@@ -939,7 +939,7 @@ def load_prediction_engine(logger):
             box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
         }
         .nav-link-selected { color: #106466 !important; font-weight: bold !important; }
-        #MainMenu, footer, header { visibility: hidden; }
+        MainMenu, footer, header { visibility: hidden; }
         div[data-testid="stHorizontalBlock"] > div .stButton button {
             background-color: #0b8793; color: white !important;
             border: 1px solid #4AC29A; border-radius: 5px;

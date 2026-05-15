@@ -142,3 +142,8 @@ pages = {
 # --- Execution ---
 if selected in pages:
     render_page(selected, pages[selected])
+
+
+        #     #MainMenu, footer, header { visibility: hidden; }
+        # .block-container { padding-top: 0.1rem !important; }
+        # .main .block-container { padding-top: 0.5rem !important; margin-top: 0 !important; }

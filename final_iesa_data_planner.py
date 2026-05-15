@@ -2439,7 +2439,7 @@ def load_data_planner(logger):
     """, unsafe_allow_html=True)
 
     # ── Sidebar UI ─────────────────────────────────────────────────────────────
-    st.markdown("<div style='margin-top: 60px;'></div>", unsafe_allow_html=True)
+    # st.markdown("<div style='margin-top: 60px;'></div>", unsafe_allow_html=True)
     st.sidebar.image(image_path, width=200)
     st.sidebar.markdown("<h2>Data Planner Dashboard</h2>", unsafe_allow_html=True)
     st.sidebar.markdown("<h3>Table and Chart Selection</h3>", unsafe_allow_html=True)
