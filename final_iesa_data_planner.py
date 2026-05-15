@@ -2265,7 +2265,9 @@ def load_data_planner(logger):
             box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             z-index: 98;
         }
-
+        #MainMenu, footer, header { visibility: hidden; }
+        .block-container { padding-top: 0.1rem !important; }
+        .main .block-container { padding-top: 0.5rem !important; margin-top: 0 !important; }
 
         /* ── Sidebar text & inputs ── */
         [data-testid="stSidebar"] h2 {
@@ -2439,7 +2441,7 @@ def load_data_planner(logger):
     """, unsafe_allow_html=True)
 
     # ── Sidebar UI ─────────────────────────────────────────────────────────────
-    # st.markdown("<div style='margin-top: 60px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 60px;'></div>", unsafe_allow_html=True)
     st.sidebar.image(image_path, width=200)
     st.sidebar.markdown("<h2>Data Planner Dashboard</h2>", unsafe_allow_html=True)
     st.sidebar.markdown("<h3>Table and Chart Selection</h3>", unsafe_allow_html=True)
