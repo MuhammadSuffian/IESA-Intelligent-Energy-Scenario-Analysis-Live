@@ -1109,15 +1109,14 @@ def load_personalized_recommendations(logger):
         [data-testid="stSidebar"] > div:first-child {
             padding-top: 76px !important;
         }
-        
+        [data-testid="stSidebar"] .stTitle,
         [data-testid="stSidebar"] h1 {
             color: white !important;
             font-size: 20px !important;
             font-weight: bold !important;
             margin-top: 5px !important;
             margin-bottom: 10px !important;
-            text-align: center !important;
-            letter-spacing: 0.5px;
+                letter-spacing: 0.5px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
         [data-testid="stSidebar"] [data-testid="stDownloadButton"] button,
