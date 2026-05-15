@@ -1401,6 +1401,7 @@ def load_personalized_recommendations(logger):
     # ── Main content ───────────────────────────────────────────────────────────
     st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
     st.image(image_path, width=160)
+    st.sidebar.title("Wisdom Mining")
     st.markdown(
         "<p style='text-align: center; color: #666; font-size: 18px; font-weight: 600; margin: 15px 0; line-height: 1.5;'>"
         "Your Intelligent Energy Scenario Analysis (IESA) assistant.<br>"

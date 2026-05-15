@@ -1580,6 +1580,7 @@ def load_scenerio_analysis(logger):
 
     # ── Sidebar content ────────────────────────────────────────────────────────
     st.sidebar.image("images/iesa_white.svg", width=200)
+    st.sidebar.title("Wisdom Mining")
     st.sidebar.markdown("<h2>IESA Scenario Analysis</h2>", unsafe_allow_html=True)
 
     # Fetch scenarios from Supabase

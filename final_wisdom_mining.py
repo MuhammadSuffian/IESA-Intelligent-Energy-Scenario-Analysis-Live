@@ -1318,6 +1318,7 @@ def load_wisdom_mining(logger):
 
     image_path = "images/iesa_white.svg"
     st.sidebar.image(image_path, width=200)
+    st.sidebar.title("Wisdom Mining")
     st.markdown("""
         <h2>Wisdom Mining Dashboard</h2>
     """, unsafe_allow_html=True)
