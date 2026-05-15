@@ -1116,9 +1116,6 @@ def load_wisdom_mining(logger):
             border-bottom: 2px solid rgba(255,255,255,0.3);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
-                #MainMenu, footer, header {
-            visibility: hidden;
-        }
         
         /* Remove extra spacing at the top */
         .block-container {
