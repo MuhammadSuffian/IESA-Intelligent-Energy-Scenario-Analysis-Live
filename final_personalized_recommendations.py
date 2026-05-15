@@ -1110,15 +1110,7 @@ def load_personalized_recommendations(logger):
             padding-top: 76px !important;
         }
         [data-testid="stSidebar"] .stTitle,
-        [data-testid="stSidebar"] h1 {
-            color: white !important;
-            font-size: 20px !important;
-            font-weight: bold !important;
-            margin-top: 5px !important;
-            margin-bottom: 10px !important;
-                letter-spacing: 0.5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
+
         [data-testid="stSidebar"] [data-testid="stDownloadButton"] button,
         [data-testid="stSidebar"] [data-testid="stDownloadButton"] > button {
             width: 100% !important;
@@ -1392,7 +1384,8 @@ def load_personalized_recommendations(logger):
 
     # ── Sidebar ────────────────────────────────────────────────────────────────
     st.sidebar.image("images/iesa_white.svg", width=200)
-    st.sidebar.title("Wisdom Mining")
+    # st.sidebar.title("Wisdom Mining")
+    st.sidebar.markdown("<p style='color:white; font-size:16px; font-weight:600; margin:4px 0 10px 0; letter-spacing:0.3px;'>Wisdom Mining</p>", unsafe_allow_html=True)
     st.sidebar.markdown("<h1>IESA Assistant</h1>", unsafe_allow_html=True)
     st.sidebar.header("Table Selection")
 
