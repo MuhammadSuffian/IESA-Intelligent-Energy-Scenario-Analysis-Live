@@ -1129,7 +1129,7 @@ def load_dash(logger):
         try:
             image = Image.open('images/iesa_green.png')
             st.image("images/iesa_white.svg", width=200)
-            st.title("Wisodm Mining")
+            st.title("Wisdom Mining")
         except Exception as e:
             st.sidebar.title("IESA Dashboard")
         st.sidebar.markdown("""
