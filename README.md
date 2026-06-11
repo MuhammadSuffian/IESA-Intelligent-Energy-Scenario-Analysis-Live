@@ -2,7 +2,7 @@
 
 A comprehensive energy analytics and visualization platform built with Streamlit, providing insights into energy consumption, predictions, and scenario analysis.
 
-## 🌟 Features
+##  Features
 
 - **Interactive Dashboard**: Real-time energy data visualization
 - **Data Planning**: Advanced data management and planning tools
@@ -12,7 +12,7 @@ A comprehensive energy analytics and visualization platform built with Streamlit
 - **Personalized Recommendations**: Customized energy optimization suggestions
 
 
-## 🏗️ Project Structure
+##  Project Structure
 
 ```
 IESA/
@@ -29,10 +29,10 @@ IESA/
 │   └── images/                   # Static images
 ```
 
-## 🚀 Running the Application
+##  Running the Application
    - Live Link: https://iesa-intelligent-energy-scenario-analysis-live-nkfuuzjjkmpmjcj.streamlit.app/
 
-## 📊 Features in Detail
+##  Features in Detail
 
 ### Dashboard
 - Real-time energy consumption visualization
@@ -60,7 +60,7 @@ IESA/
 - Multiple forecasting models
 - Accuracy metrics
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -68,24 +68,24 @@ IESA/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Authors
+##  Authors
 
 - Muhammad Suffian Tafoor
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Streamlit team for the amazing framework
 - All contributors who have helped shape this project
 
-## 📞 Support
+##  Support
 
 For support, muhammad.suffian.5959@gmail.com or create an issue in the repository.
 
-## 🔄 Updates
+##  Updates
 
 ### Latest Updates
 - Added K-means clustering for scenario analysis
