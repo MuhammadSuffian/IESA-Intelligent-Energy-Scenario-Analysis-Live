@@ -11,47 +11,6 @@ A comprehensive energy analytics and visualization platform built with Streamlit
 - **Prediction Engine**: AI-powered energy consumption predictions
 - **Personalized Recommendations**: Customized energy optimization suggestions
 
-## 📋 Prerequisites
-
-- Python 3.8 or higher
-- MySQL Server 8.0 or higher
-- Git
-
-## 🚀 Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/IESA.git
-   cd IESA/Streamlit_Dashboards
-   ```
-
-2. **Create and activate a virtual environment**
-   ```bash
-   # Windows
-   python -m venv venv
-   .\venv\Scripts\activate
-
-   # Linux/Mac
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-3. **Install required packages**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Database Setup**
-   - Install MySQL Server if not already installed
-   - Create a new database named `iesa_db`
-   - Update database credentials in `mysql_con.py`:
-     ```python
-     host="localhost"
-     port="3306"
-     user="your_username"
-     passwd="your_password"
-     db="iesa_db"
-     ```
 
 ## 🏗️ Project Structure
 
@@ -80,18 +39,6 @@ IESA/
 2. **Access the dashboard**
    - Open your web browser
    - Navigate to `http://localhost:8501`
-
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file in the root directory with the following variables:
-```
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=your_username
-DB_PASSWORD=your_password
-DB_NAME=iesa_db
-```
 
 ### Logging Configuration
 Logs are stored in the `logs/` directory. Configure logging levels in `utils/logger.py`.
@@ -138,7 +85,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- Your Name - Initial work
+- Muhammad Suffian Tafoor
 
 ## 🙏 Acknowledgments
 
@@ -147,7 +94,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email your-email@example.com or create an issue in the repository.
+For support, muhammad.suffian.5959@gmail.com or create an issue in the repository.
 
 ## 🔄 Updates
 
