@@ -32,9 +32,6 @@ IESA/
 ## 🚀 Running the Application
    - Live Link: https://iesa-intelligent-energy-scenario-analysis-live-nkfuuzjjkmpmjcj.streamlit.app/
 
-### Logging Configuration
-Logs are stored in the `logs/` directory. Configure logging levels in `utils/logger.py`.
-
 ## 📊 Features in Detail
 
 ### Dashboard
