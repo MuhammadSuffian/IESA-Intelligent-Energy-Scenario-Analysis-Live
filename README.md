@@ -30,15 +30,7 @@ IESA/
 ```
 
 ## 🚀 Running the Application
-
-1. **Start the application**
-   ```bash
-   streamlit run iesa_dashboard.py
-   ```
-
-2. **Access the dashboard**
-   - Open your web browser
-   - Navigate to `http://localhost:8501`
+   - Live Link: https://iesa-intelligent-energy-scenario-analysis-live-nkfuuzjjkmpmjcj.streamlit.app/
 
 ### Logging Configuration
 Logs are stored in the `logs/` directory. Configure logging levels in `utils/logger.py`.
